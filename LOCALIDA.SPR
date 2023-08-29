@@ -1,0 +1,374 @@
+*       *********************************************************
+*       *                                                         
+*       * 07/09/99            LOCALIDA.SPR               20:44:10 
+*       *                                                         
+*       *********************************************************
+*       *                                                         
+*       * Gustavo Dagoberto                                       
+*       *                                                         
+*       * Copyright (c) 1999 Gusmafer                             
+*       * Dirección                                               
+*       * Ciudad,     C.P.                                        
+*       * País                                              
+*       *                                                         
+*       * Description:                                            
+*       * Este programa lo ha generado automáticamente GENSCRN.    
+*       *                                                         
+*       *********************************************************
+
+
+#REGION 0
+REGIONAL m.currarea, m.talkstat, m.compstat
+
+IF SET("TALK") = "ON"
+	SET TALK OFF
+	m.talkstat = "ON"
+ELSE
+	m.talkstat = "OFF"
+ENDIF
+m.compstat = SET("COMPATIBLE")
+SET COMPATIBLE FOXPLUS
+
+m.rborder = SET("READBORDER")
+SET READBORDER ON
+
+m.currarea = SELECT()
+
+
+*       *********************************************************
+*       *                                                         
+*       *  S4650824/Windows Bases de datos, índices, relaciones   
+*       *                                                         
+*       *********************************************************
+*
+
+IF USED("localida")
+	SELECT localida
+	SET ORDER TO 0
+ELSE
+	SELECT 0
+	USE (LOCFILE("localida.dbf","DBF","Buscar  localida?"));
+		AGAIN ALIAS localida ;
+		ORDER 0
+ENDIF
+
+IF USED("empledor")
+	SELECT empledor
+	SET ORDER TO 0
+ELSE
+	SELECT 0
+	USE (LOCFILE("empledor.dbf","DBF","Buscar  empledor?"));
+		AGAIN ALIAS empledor ;
+		ORDER 0
+ENDIF
+
+SELECT localida
+
+
+*       *********************************************************
+*       *                                                         
+*       *             Windows Definiciones de ventana             
+*       *                                                         
+*       *********************************************************
+*
+
+IF NOT WEXIST("localidade") ;
+	OR UPPER(WTITLE("LOCALIDADE")) == "LOCALIDADE.PJX" ;
+	OR UPPER(WTITLE("LOCALIDADE")) == "LOCALIDADE.SCX" ;
+	OR UPPER(WTITLE("LOCALIDADE")) == "LOCALIDADE.MNX" ;
+	OR UPPER(WTITLE("LOCALIDADE")) == "LOCALIDADE.PRG" ;
+	OR UPPER(WTITLE("LOCALIDADE")) == "LOCALIDADE.FRX" ;
+	OR UPPER(WTITLE("LOCALIDADE")) == "LOCALIDADE.QPR"
+	DEFINE WINDOW localidade ;
+		AT 1.211, 8.429 ;
+		SIZE 20.615,82.600 ;
+		TITLE "Localidades" ;
+		FONT "MS Sans Serif", 8 ;
+		FLOAT ;
+		CLOSE ;
+		NOMINIMIZE ;
+		SYSTEM ;
+		COLOR RGB(,,,255,255,255)
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       *  LOCALIDA/Windows Código de configuración - SECCION 2   
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+SEN = .F.
+M.COD_postal = 0
+nreg = 0
+SCATTER MEMVAR
+
+
+*       *********************************************************
+*       *                                                         
+*       *        LOCALIDA/Windows Distribución de pantalla        
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+IF WVISIBLE("localidade")
+	ACTIVATE WINDOW localidade SAME
+ELSE
+	ACTIVATE WINDOW localidade NOSHOW
+ENDIF
+@ 0.462,13.200 SAY "Localidades" ;
+	PICTURE "@I" ;
+	FONT "GeoSlab703 MdCn BT", 24 ;
+	STYLE "B" ;
+	COLOR RGB(0,0,0,255,255,255)
+@ 10.923,2.200 SAY "Localidad" ;
+	FONT "MS Sans Serif", 12 ;
+	STYLE "BT" ;
+	COLOR RGB(0,0,0,,,,)
+@ 6.923,2.200 SAY "Codigo" ;
+	FONT "MS Sans Serif", 12 ;
+	STYLE "BT" ;
+	COLOR RGB(0,0,0,,,,)
+@ 7.231,19.600 GET m.cod_postal ;
+	SIZE 1.000,6.400 ;
+	DEFAULT 0 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "9999" ;
+	DISABLE
+@ 11.154,19.600 GET m.localidad ;
+	SIZE 1.000,32.800 ;
+	DEFAULT " " ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@K!" ;
+	DISABLE
+@ 10.154,64.800 GET m.ACEPTAR ;
+	PICTURE "@*VN ACEPTAR;CANCELAR" ;
+	SIZE 2.077,12.000,0.308 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "B" ;
+	VALID _s8718g12w() ;
+	DISABLE
+@ 17.538,4.800 GET m.movimiento ;
+	PICTURE "@*BHN " + ;
+		(LOCFILE("..\wizards\wizbmps\wztop.bmp","BMP|ICO|PCT|ICN","¿Dónde está wztop?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzback.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzback?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzlocate.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzlocate?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wznext.bmp","BMP|ICO|PCT|ICN","¿Dónde está wznext?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzend.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzend?")) ;
+	SIZE 2.000,9.400,0.800 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	VALID _s8718g15f()
+@ 1.846,64.800 GET m.ACCION ;
+	PICTURE "@*BVN " + ;
+		(LOCFILE("..\wizards\wizbmps\wznew.bmp","BMP|ICO|PCT|ICN","¿Dónde está wznew?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzdelete.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzdelete?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzedit.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzedit?")) ;
+	SIZE 2.077,14.800,0.308 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	VALID _s8718g166()
+@ 15.692,64.800 GET m.salir ;
+	PICTURE "@*BHT " + ;
+		(LOCFILE("..\wizards\wizbmps\wzclose.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzclose?")) ;
+	SIZE 3.769,14.600,0.800 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8
+
+IF NOT WVISIBLE("localidade")
+	ACTIVATE WINDOW localidade
+ENDIF
+
+READ CYCLE MODAL
+
+RELEASE WINDOW localidade
+
+*       *********************************************************
+*       *                                                         
+*       *             Windows Cerrando bases de datos             
+*       *                                                         
+*       *********************************************************
+*
+
+IF USED("localida")
+	SELECT localida
+	USE
+ENDIF
+
+IF USED("empledor")
+	SELECT empledor
+	USE
+ENDIF
+
+SELECT (m.currarea)
+
+
+#REGION 0
+
+SET READBORDER &rborder
+
+IF m.talkstat = "ON"
+	SET TALK ON
+ENDIF
+IF m.compstat = "ON"
+	SET COMPATIBLE ON
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       * _S8718G12W           m.ACEPTAR VALID                    
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         LOCALIDA,     Record Number:    9  
+*       * Variable:            m.ACEPTAR                          
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      1                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s8718g12w     &&  m.ACEPTAR VALID
+#REGION 1
+IF M.ACEPTAR = 1
+	DO CASE
+	CASE M.ACCION = 1
+		set order to 1	
+		IF empty(M.localidad)
+				WAIT WINDOW NOWAIT "ESCRIBA LA LOCALIDAD"
+				_CUROBJ = 2
+				return
+		ENDIF
+		if m.cod_postal > 0
+			SEEK M.cod_postal
+			IF FOUND()
+				WAIT WINDOW NOWAIT "CODIGO REPETIDO"
+				SHOW GETS
+				_CUROBJ = 1
+				return
+			ENDIF
+		ELSE
+			WAIT WINDOW NOWAIT "ESCRIBA EL CODIGO"
+			SHOW GETS
+			_CUROBJ = 1
+			return
+		ENDIF			
+		INSERT INTO localida FROM MEMVAR
+		SHOW GETS DISABLE
+		SHOW GET M.ACCION ENABLE
+		SHOW GET M.MOVIMIENTO ENABLE
+		SHOW GET M.ACEPTAR DISABLE
+		SHOW GET M.SALIR ENABLE
+
+	CASE M.ACCION = 3
+		set order to 1	
+		IF empty(M.localidad)
+				WAIT WINDOW NOWAIT "ESCRIBA LA LOCALIDAD"
+				_CUROBJ = 2
+				return
+		ENDIF
+		if m.cod_postal > 0
+			if m.cod_postal <> cod_postal
+				SEEK M.cod_postal
+				IF FOUND()
+					WAIT WINDOW NOWAIT "CODIGO REPETIDO"
+					SHOW GETS
+					_CUROBJ = 1
+					return
+				ENDIF
+			endif
+		ELSE
+			WAIT WINDOW NOWAIT "ESCRIBA EL CODIGO"
+			SHOW GETS
+			_CUROBJ = 1
+			return
+		ENDIF
+
+		SET ORDER TO 1
+		goto nreg
+		GATHER MEMVAR
+		SHOW GETS DISABLE
+		SHOW GET M.ACCION ENABLE
+		SHOW GET M.MOVIMIENTO ENABLE
+		SHOW GET M.ACEPTAR DISABLE
+		SHOW GET M.SALIR ENABLE
+	ENDCASE
+ELSE
+	SHOW GETS DISABLE
+	SHOW GET M.ACCION ENABLE
+	SHOW GET M.MOVIMIENTO ENABLE
+	SHOW GET M.ACEPTAR DISABLE
+	SHOW GET M.SALIR ENABLE
+ENDIF
+SHOW GETS
+
+*       *********************************************************
+*       *                                                         
+*       * _S8718G15F           m.movimiento VALID                 
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         LOCALIDA,     Record Number:   10  
+*       * Variable:            m.movimiento                       
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      2                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s8718g15f     &&  m.movimiento VALID
+#REGION 1
+DO P_MUEVE
+show gets
+
+*       *********************************************************
+*       *                                                         
+*       * _S8718G166           m.ACCION VALID                     
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         LOCALIDA,     Record Number:   11  
+*       * Variable:            m.ACCION                           
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      3                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s8718g166     &&  m.ACCION VALID
+#REGION 1
+DO CASE
+CASE M.ACCION = 1
+	SCATTER MEMVAR BLANK
+	SHOW GETS ENABLE
+	SHOW GET M.ACCION DISABLE
+	SHOW GET M.MOVIMIENTO DISABLE
+	SHOW GET M.SALIR DISABLE
+CASE M.ACCION = 2
+	SELECT EMPLEDOR
+	LOCATE FOR EMPLEDOR.codlugar = LOCALIDA.COD_POSTAL
+	IF FOUND()
+		WAIT WINDOW NOWAIT "EXISTEN EMPLEADORES QUE UTILIZAN ESTA LOCALIDAD " + CHR(13) + "COMO LUGAR DE PAGO; POR LO TANTO NO ESTA PERMITIDO DARLA DE BAJA"
+		SELECT LOCALIDA
+		RETURN
+	ENDIF	
+	SELECT LOCALIDA
+	DO R_BORRAR.SPR
+	SHOW GETS
+	
+CASE M.ACCION = 3
+	SHOW GETS ENABLE
+	SHOW GET M.ACCION DISABLE
+	SHOW GET M.MOVIMIENTO DISABLE
+	SHOW GET M.SALIR DISABLE
+	nReg = recno()
+	SCATTER MEMVAR
+ENDCASE

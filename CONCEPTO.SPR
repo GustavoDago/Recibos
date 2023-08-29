@@ -1,0 +1,624 @@
+*       *********************************************************
+*       *                                                         
+*       * 07/09/99            CONCEPTO.SPR               14:37:14 
+*       *                                                         
+*       *********************************************************
+*       *                                                         
+*       * Gustavo Dagoberto                                       
+*       *                                                         
+*       * Copyright (c) 1999 Gusmafer                             
+*       * Dirección                                               
+*       * Ciudad,     C.P.                                        
+*       * País                                              
+*       *                                                         
+*       * Description:                                            
+*       * Este programa lo ha generado automáticamente GENSCRN.    
+*       *                                                         
+*       *********************************************************
+
+
+#REGION 0
+REGIONAL m.currarea, m.talkstat, m.compstat
+
+IF SET("TALK") = "ON"
+	SET TALK OFF
+	m.talkstat = "ON"
+ELSE
+	m.talkstat = "OFF"
+ENDIF
+m.compstat = SET("COMPATIBLE")
+SET COMPATIBLE FOXPLUS
+
+m.rborder = SET("READBORDER")
+SET READBORDER ON
+
+m.currarea = SELECT()
+
+
+*       *********************************************************
+*       *                                                         
+*       *  CONCEPTO/Windows Bases de datos, índices, relaciones   
+*       *                                                         
+*       *********************************************************
+*
+
+IF USED("concepto")
+	SELECT concepto
+	SET ORDER TO TAG "codigo"
+ELSE
+	SELECT 0
+	USE (LOCFILE("concepto.dbf","DBF","Buscar  concepto?"));
+		AGAIN ALIAS concepto ;
+		ORDER TAG "codigo"
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       *             Windows Definiciones de ventana             
+*       *                                                         
+*       *********************************************************
+*
+
+IF NOT WEXIST("concepto") ;
+	OR UPPER(WTITLE("CONCEPTO")) == "CONCEPTO.PJX" ;
+	OR UPPER(WTITLE("CONCEPTO")) == "CONCEPTO.SCX" ;
+	OR UPPER(WTITLE("CONCEPTO")) == "CONCEPTO.MNX" ;
+	OR UPPER(WTITLE("CONCEPTO")) == "CONCEPTO.PRG" ;
+	OR UPPER(WTITLE("CONCEPTO")) == "CONCEPTO.FRX" ;
+	OR UPPER(WTITLE("CONCEPTO")) == "CONCEPTO.QPR"
+	DEFINE WINDOW concepto ;
+		AT 0.526, 2.429 ;
+		SIZE 26.154,91.800 ;
+		TITLE "ADMINISTRADOR DE CONCEPTOS" ;
+		FONT "MS Sans Serif", 8 ;
+		FLOAT ;
+		CLOSE ;
+		NOMINIMIZE ;
+		SYSTEM ;
+		COLOR RGB(,,,192,192,192)
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       *  CONCEPTO/Windows Código de configuración - SECCION 2   
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+SCATTER MEMVAR
+RECNUM = 0
+DIMENSION ARE(8,2), AEM(12,2), ACO(2,2)
+ARE(1) = "TOTAL HABERES"
+ARE(2) = "M.TOTHABERES"
+ARE(3) = "TOTAL DESCUENTOS"
+ARE(4) = "M.TOTDESCUEN"
+ARE(5) = "TOTAL ADICIONALES"
+ARE(6) = "M.TOTADICION"
+ARE(7) = "TOTAL ANTICIPOS"
+ARE(8) = "M.TOTANTICIP"
+ARE(9) = "TOTAL"
+ARE(10) = "M.TOTAL"
+ARE(11) = "UNIDADES"
+ARE(12) = "M.UNIDADES"
+ARE(13) = "HABER"
+ARE(14) = "M.HABERES"
+ARE(15) = "DESCUENTO"
+ARE(16) = "M.DESCUENTO"
+
+AEM(1) = "ANTIGUEDAD (años)"
+AEM(2) = "EMPLEADO.ANTIGUEDAD"
+AEM(3) = "PORCENTAJE ANTIGUEDAD"
+AEM(4) = "EMPLEADO.ANT_PORCEN"
+AEM(5) = "Nº DE HIJOS"
+AEM(6) = "EMPLEADO.HIJOS"
+AEM(7) = "TIPO DE PAGO"
+AEM(8) = "EMPLEADO.TIPODEPAGO"
+AEM(9) = "JORNAL O SUELDO"
+AEM(10) = "EMPLEADO.JOR_O_SUE"
+AEM(11) = "VALOR"
+AEM(12) = "EMPLEADO.VALOR"
+AEM(13) = "HORAS EXTRAS (%)"
+AEM(14) = "EMPLEADO.HORASEXTRA"
+AEM(15) = "HORAS NOCTURNAS (%)"
+AEM(16) = "EMPLEADO.HORASNOCT"
+AEM(17) = "HORAS FERIADO (%)"
+AEM(18) = "EMPLEADO.HORASFERIA"
+AEM(19) = "OBRA SOCIAL (%)"
+AEM(20) = "EMPLEADO.OBRASOCIAL"
+AEM(21) = "CUOTA SINDICAL (%)"
+AEM(22) = "EMPLEADO.CUOTASINDI"
+AEM(23) = "PRESENTISMO (%)"
+AEM(24) = "EMPLEADO.PRESENTMO"
+
+ACO(1) = "PORCENTAJE"
+ACO(2) = "CONCEPTO.PORCENTAJE"
+ACO(3) = "VALOR"
+ACO(4) = "CONCEPTO.VALOR"
+
+
+*       *********************************************************
+*       *                                                         
+*       *        CONCEPTO/Windows Distribución de pantalla        
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+IF WVISIBLE("concepto")
+	ACTIVATE WINDOW concepto SAME
+ELSE
+	ACTIVATE WINDOW concepto NOSHOW
+ENDIF
+@ 0.077,43.200 SAY "Descripción" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,0,,,,)
+@ 1.923,2.400 SAY "Tipo" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,0,,,,)
+@ 0.077,2.400 SAY "Codigo" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,0,,,,)
+@ 3.769,2.400 SAY "Porcentaje" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T"
+@ 1.923,43.200 SAY "valor" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T"
+@ 5.615,2.400 SAY "Fórmula" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T"
+@ 0.077,58.000 GET m.descripcio ;
+	SIZE 1.000,32.800 ;
+	DEFAULT " " ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@K!" ;
+	DISABLE
+@ 1.846,19.200 GET m.tipo ;
+	PICTURE "@^ Remuneración;Descuento;Adicional;Anticipo" ;
+	SIZE 1.538,17.833 ;
+	DEFAULT "Remuneración" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "B" ;
+	DISABLE
+@ 3.769,19.600 GET m.porcentaje ;
+	SIZE 1.000,9.000 ;
+	DEFAULT 0 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "999.99" ;
+	DISABLE
+@ 1.923,58.000 GET m.valor ;
+	SIZE 1.000,16.000 ;
+	DEFAULT 0 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@K 999.99" ;
+	DISABLE
+@ 5.615,19.600 GET m.formula ;
+	SIZE 2.000,71.000 ;
+	DEFAULT " " ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@!" ;
+	DISABLE
+@ 3.769,43.200 GET m.comunatodo ;
+	PICTURE "@*C Común a todos" ;
+	SIZE 1.308,18.500 ;
+	DEFAULT 0 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "BT" ;
+	DISABLE
+@ 0.077,19.600 SAY M.codigo ;
+	SIZE 1.000,6.400 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@L"
+@ 8.308,76.600 GET m.ACCION ;
+	PICTURE "@*BVN " + ;
+		(LOCFILE("..\wizards\wizbmps\wznew.bmp","BMP|ICO|PCT|ICN","¿Dónde está wznew?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzdelete.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzdelete?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzedit.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzedit?")) ;
+	SIZE 2.077,14.800,0.308 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	VALID _s870vc5i3()
+@ 16.615,76.600 GET m.ACEPTAR ;
+	PICTURE "@*VN ACEPTAR;CANCELAR" ;
+	SIZE 2.000,12.000,0.308 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "B" ;
+	VALID _s870vc5j2() ;
+	DISABLE
+@ 24.000,26.400 GET m.movimiento ;
+	PICTURE "@*BHN " + ;
+		(LOCFILE("..\wizards\wizbmps\wztop.bmp","BMP|ICO|PCT|ICN","¿Dónde está wztop?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzback.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzback?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzlocate.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzlocate?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wznext.bmp","BMP|ICO|PCT|ICN","¿Dónde está wznext?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzend.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzend?")) ;
+	SIZE 2.000,8.800,0.800 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	VALID _s870vc5lq()
+@ 23.077,2.400 GET M.ORDEN ;
+	PICTURE "@*RVN CODIGO;DESCRIPCION" ;
+	SIZE 1.308,18.167,0.308 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "BT" ;
+	VALID _s870vc5m7() ;
+	COLOR ,,,,,,,,RGB(255,0,0,,,,),RGB(255,0,0,,,,)
+@ 22.154,76.600 GET m.salir ;
+	PICTURE "@*BHT " + ;
+		(LOCFILE("..\wizards\wizbmps\wzclose.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzclose?")) ;
+	SIZE 3.769,14.600,0.800 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8
+@ 12.154,2.600 GET M.RE ;
+ 	PICTURE "@&N" ;
+	FROM ARE ;
+	SIZE 10.385,23.800 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	VALID _s870vc5mw() ;
+	DISABLE
+@ 12.231,29.000 GET M.EM ;
+ 	PICTURE "@&N" ;
+	FROM AEM ;
+	SIZE 10.385,21.400 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	VALID _s870vc5nd() ;
+	DISABLE
+@ 12.231,53.000 GET M.CO ;
+ 	PICTURE "@&N" ;
+	FROM ACO ;
+	SIZE 10.385,21.400 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	VALID _s870vc5nu() ;
+	DISABLE
+@ 10.231,4.800 SAY "RECIBOS" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T"
+@ 10.231,31.200 SAY "EMPLEADOS" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T"
+@ 10.231,55.200 SAY "CONCEPTOS" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T"
+@ 10.231,2.400 TO 22.693,74.600 ;
+	PEN 1, 8
+@ 11.154,2.400 TO 11.154,74.600 ;
+	PEN 1, 8 ;
+	STYLE "1"
+@ 11.154,28.800 TO 12.154,28.800 ;
+	PEN 1, 8
+@ 11.154,52.800 TO 12.154,52.800 ;
+	PEN 1, 8
+@ 7.769,2.400 SAY "HACIENDO DOBLE CLICK EN ALGUN ELEMENTO DE LAS " + CHR(13) + ;
+		"LISTAS, AUTOMATICAMENTE SE AGREGA A LA FORMULA" ;
+	SIZE 2.000,59.200, 0.000 ;
+	FONT "Arial", 8 ;
+	STYLE "T" ;
+	COLOR RGB(255,255,255,,,,)
+
+IF NOT WVISIBLE("concepto")
+	ACTIVATE WINDOW concepto
+ENDIF
+
+READ CYCLE MODAL ;
+	SHOW _s870vc5p4()
+
+RELEASE WINDOW concepto
+
+*       *********************************************************
+*       *                                                         
+*       *             Windows Cerrando bases de datos             
+*       *                                                         
+*       *********************************************************
+*
+
+IF USED("concepto")
+	SELECT concepto
+	USE
+ENDIF
+
+SELECT (m.currarea)
+
+
+#REGION 0
+
+SET READBORDER &rborder
+
+IF m.talkstat = "ON"
+	SET TALK ON
+ENDIF
+IF m.compstat = "ON"
+	SET COMPATIBLE ON
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC5I3           m.ACCION VALID                     
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         CONCEPTO,     Record Number:   16  
+*       * Variable:            m.ACCION                           
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      1                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc5i3     &&  m.ACCION VALID
+#REGION 1
+DO CASE
+CASE M.ACCION = 1
+	SCATTER MEMVAR BLANK
+	SHOW GETS ENABLE
+	SHOW GET M.ACCION DISABLE
+	SHOW GET M.MOVIMIENTO DISABLE
+	SHOW GET M.SALIR DISABLE
+	SHOW GET M.ORDEN DISABLE
+	SET ORDER TO 1
+	GO BOTTOM
+	M.FORMULA = " "
+	M.CODIGO = CODIGO + 1
+	_CUROBJ = 1
+
+CASE M.ACCION = 2
+	DO R_BORRAR.SPR
+	SHOW GETS
+CASE M.ACCION = 3
+	SHOW GETS ENABLE
+	SHOW GET M.ACCION DISABLE
+	SHOW GET M.MOVIMIENTO DISABLE
+	SHOW GET M.SALIR DISABLE
+	SHOW GET M.ORDEN DISABLE
+	SCATTER MEMVAR
+	RECNUM = RECNO()
+ENDCASE
+SHOW GETS
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC5J2           m.ACEPTAR VALID                    
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         CONCEPTO,     Record Number:   17  
+*       * Variable:            m.ACEPTAR                          
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      2                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc5j2     &&  m.ACEPTAR VALID
+#REGION 1
+IF M.ACEPTAR = 1
+	DO CASE
+	CASE M.ACCION = 1
+
+		IF M.DESCRIPCIO = "  "
+			WAIT WINDOW NOWAIT "ESCRIBA LA DESCRIPCION"
+			_CUROBJ = 2
+			RETURN
+		ELSE
+			SET ORDER TO 2
+			SEEK M.DESCRIPCIO
+			IF FOUND()
+				WAIT WINDOW NOWAIT "DESCRIPCION REPETIDA"
+				_CUROBJ = 3
+				RETURN
+			ENDIF
+		ENDIF			
+		
+		IF LEN(ALLTRIM(M.FORMULA)) > 45
+			WAIT WINDOW NOWAIT "LA FORMULA ES MAYOR A 45 CARACTERES"
+			RETURN
+		ELSE
+			M.FORMULA = ALLTRIM(M.FORMULA)
+		ENDIF
+
+		IF EMPTY(M.FORMULA)
+			M.FORMULA = IIF(M.TIPO # 2, "M.HABERES", "M.DESCUENTO")
+		ENDIF
+
+		INSERT INTO Concepto FROM MEMVAR
+		SHOW GETS DISABLE
+		SHOW GET M.ACCION ENABLE
+		SHOW GET M.MOVIMIENTO ENABLE
+		SHOW GET M.ACEPTAR DISABLE
+		SHOW GET M.ORDEN ENABLE
+		SHOW GET M.SALIR ENABLE
+		
+	CASE M.ACCION = 3
+		IF M.DESCRIPCIO > "           "
+			IF M.DESCRIPCIO <> DESCRIPCIO
+				SET ORDER TO 2
+				SEEK M.DESCRIPCIO
+				IF FOUND()
+					WAIT WINDOW NOWAIT "DESCRIPCION REPETIDA"
+					_CUROBJ = 3
+					RETURN
+				ENDIF
+			ENDIF
+		ELSE
+			WAIT WINDOW NOWAIT "ESCRIBA LA DESCRIPCION"
+			_CUROBJ = 3
+			RETURN
+		ENDIF
+
+		IF LEN(ALLTRIM(M.FORMULA)) > 45
+			WAIT WINDOW NOWAIT "LA FORMULA ES MAYOR A 45 CARACTERES"
+			RETURN
+		ELSE
+			M.FORMULA = ALLTRIM(M.FORMULA)
+		ENDIF
+
+
+		IF EMPTY(M.FORMULA)
+			M.FORMULA = IIF(M.TIPO # 2, "M.HABERES", "M.DESCUENTO")
+		ENDIF
+
+		GOTO RECNUM
+		GATHER MEMVAR
+		SHOW GETS DISABLE
+		SHOW GET M.ACCION ENABLE
+		SHOW GET M.MOVIMIENTO ENABLE
+		SHOW GET M.ACEPTAR DISABLE
+		SHOW GET M.ORDEN ENABLE
+		SHOW GET M.SALIR ENABLE
+	
+ENDCASE
+ELSE
+	SHOW GETS DISABLE
+	SHOW GET M.ACCION ENABLE
+	SHOW GET M.MOVIMIENTO ENABLE
+	SHOW GET M.ACEPTAR DISABLE
+	SHOW GET M.SALIR ENABLE
+	SHOW GET M.ORDEN ENABLE
+ENDIF
+set order to ORDEN
+SHOW GETS
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC5LQ           m.movimiento VALID                 
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         CONCEPTO,     Record Number:   18  
+*       * Variable:            m.movimiento                       
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      3                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc5lq     &&  m.movimiento VALID
+#REGION 1
+DO P_MUEVE
+show gets
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC5M7           M.ORDEN VALID                      
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         CONCEPTO,     Record Number:   19  
+*       * Variable:            M.ORDEN                            
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Radio Button                       
+*       * Snippet Number:      4                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc5m7     &&  M.ORDEN VALID
+#REGION 1
+SET ORDER TO ORDEN
+SHOW GETS
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC5MW           M.RE VALID                         
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         CONCEPTO,     Record Number:   21  
+*       * Variable:            M.RE                               
+*       * Called By:           VALID Clause                       
+*       * Object Type:         List                               
+*       * Snippet Number:      5                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc5mw     &&  M.RE VALID
+#REGION 1
+M.FORMULA = M.FORMULA - ARE[M.RE,2]
+SHOW GETS
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC5ND           M.EM VALID                         
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         CONCEPTO,     Record Number:   22  
+*       * Variable:            M.EM                               
+*       * Called By:           VALID Clause                       
+*       * Object Type:         List                               
+*       * Snippet Number:      6                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc5nd     &&  M.EM VALID
+#REGION 1
+M.FORMULA = M.FORMULA - AEM[M.EM,2]
+SHOW GETS
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC5NU           M.CO VALID                         
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         CONCEPTO,     Record Number:   23  
+*       * Variable:            M.CO                               
+*       * Called By:           VALID Clause                       
+*       * Object Type:         List                               
+*       * Snippet Number:      7                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc5nu     &&  M.CO VALID
+#REGION 1
+M.FORMULA = M.FORMULA - ACO[M.CO,2]
+SHOW GETS
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC5P4           Nivel de lectura SHOW              
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         CONCEPTO                           
+*       * Called By:           READ Statement                     
+*       * Snippet Number:      8                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc5p4     && Read Level Show
+PRIVATE currwind
+STORE WOUTPUT() TO currwind
+*
+* Código SHOW de la pantalla: CONCEPTO
+*
+#REGION 1
+IF SYS(2016) = "CONCEPTO" OR SYS(2016) = "*"
+	ACTIVATE WINDOW concepto SAME
+	@ 0.077,19.600 SAY M.codigo ;
+		SIZE 1.000,6.400, 0.000 ;
+		FONT "MS Sans Serif", 8 ;
+		PICTURE "@L"
+ENDIF
+IF NOT EMPTY(currwind)
+	ACTIVATE WINDOW (currwind) SAME
+ENDIF

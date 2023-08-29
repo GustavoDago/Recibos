@@ -1,0 +1,698 @@
+*       *********************************************************
+*       *                                                         
+*       * 07/09/99            EMPLEADO.SPR               14:37:13 
+*       *                                                         
+*       *********************************************************
+*       *                                                         
+*       * Gustavo Dagoberto                                       
+*       *                                                         
+*       * Copyright (c) 1999 Gusmafer                             
+*       * Dirección                                               
+*       * Ciudad,     C.P.                                        
+*       * País                                              
+*       *                                                         
+*       * Description:                                            
+*       * Este programa lo ha generado automáticamente GENSCRN.    
+*       *                                                         
+*       *********************************************************
+
+
+#REGION 0
+REGIONAL m.currarea, m.talkstat, m.compstat
+
+IF SET("TALK") = "ON"
+	SET TALK OFF
+	m.talkstat = "ON"
+ELSE
+	m.talkstat = "OFF"
+ENDIF
+m.compstat = SET("COMPATIBLE")
+SET COMPATIBLE FOXPLUS
+
+m.rborder = SET("READBORDER")
+SET READBORDER ON
+
+m.currarea = SELECT()
+
+
+*       *********************************************************
+*       *                                                         
+*       *  S2633401/Windows Bases de datos, índices, relaciones   
+*       *                                                         
+*       *********************************************************
+*
+
+IF USED("empleado")
+	SELECT empleado
+	SET ORDER TO TAG "codigo"
+ELSE
+	SELECT 0
+	USE (LOCFILE("empleado.dbf","DBF","Buscar  empleado?"));
+		AGAIN ALIAS empleado ;
+		ORDER TAG "codigo"
+ENDIF
+
+IF USED("empledor")
+	SELECT empledor
+	SET ORDER TO TAG "codigo"
+ELSE
+	SELECT 0
+	USE (LOCFILE("empledor.dbf","DBF","Buscar  empledor?"));
+		AGAIN ALIAS empledor ;
+		ORDER TAG "codigo"
+ENDIF
+
+SELECT empleado
+
+SET RELATION OFF INTO empledor
+SET RELATION TO empleado.cod_empdor INTO empledor ADDITIVE
+
+SELECT empleado
+
+*       *********************************************************
+*       *                                                         
+*       *             Windows Definiciones de ventana             
+*       *                                                         
+*       *********************************************************
+*
+
+IF NOT WEXIST("empleados") ;
+	OR UPPER(WTITLE("EMPLEADOS")) == "EMPLEADOS.PJX" ;
+	OR UPPER(WTITLE("EMPLEADOS")) == "EMPLEADOS.SCX" ;
+	OR UPPER(WTITLE("EMPLEADOS")) == "EMPLEADOS.MNX" ;
+	OR UPPER(WTITLE("EMPLEADOS")) == "EMPLEADOS.PRG" ;
+	OR UPPER(WTITLE("EMPLEADOS")) == "EMPLEADOS.FRX" ;
+	OR UPPER(WTITLE("EMPLEADOS")) == "EMPLEADOS.QPR"
+	DEFINE WINDOW empleados ;
+		AT 3.000, 14.000 ;
+		SIZE 21.846,90.600 ;
+		TITLE "ADMINISTRADOR DE EMPLEADOS" ;
+		FONT "MS Sans Serif", 8 ;
+		FLOAT ;
+		CLOSE ;
+		NOMINIMIZE ;
+		SYSTEM ;
+		FILL FILE LOCFILE("ONDAS.BMP","BMP|ICO|PCT|ICN", ;
+			"¿Dónde está ondas?")
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       *  EMPLEADO/Windows Código de configuración - SECCION 2   
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+SEN = .F.
+RECNUM = 0
+scatter memvar
+
+*       *********************************************************
+*       *                                                         
+*       *        EMPLEADO/Windows Distribución de pantalla        
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+IF WVISIBLE("empleados")
+	ACTIVATE WINDOW empleados SAME
+ELSE
+	ACTIVATE WINDOW empleados NOSHOW
+ENDIF
+@ 2.615,0.600 SAY "Apellido y Nombre" ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(0,255,0,0,128,128)
+@ 14.385,0.000 SAY "Tipo de pago" ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(0,255,0,0,128,128)
+@ 0.538,0.600 SAY "Codigo" ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(0,255,0,0,128,128)
+@ 6.769,0.000 SAY "fecha ingreso" ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(0,255,0,0,128,128)
+@ 16.462,0.000 SAY "Valor" ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(0,255,0,0,128,128)
+@ 3.923,0.600 SAY "DNI" ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(0,255,0,0,128,128)
+@ 8.462,0.000 SAY "Categoria" ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(0,255,0,0,128,128)
+@ 10.000,0.000 SAY "Antiguedad" ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(0,255,0,0,128,128)
+@ 1.231,57.600 SAY "Horas extra (%)" ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(0,255,0,0,128,128)
+@ 2.615,57.600 SAY "Horas nocturnas (%)" ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(0,255,0,0,128,128)
+@ 4.000,57.600 SAY "Horas feriado (%)" ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(0,255,0,0,128,128)
+@ 12.308,0.000 SAY "Hijos" ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(0,255,0,0,128,128)
+@ 5.385,57.600 SAY "Obra social (%)" ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(0,255,0,0,128,128)
+@ 6.769,57.600 SAY "Cuota sindical (%) " ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(0,255,0,0,128,128)
+@ 9.538,57.600 SAY "Código empleador" ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(0,255,0,0,128,128)
+@ 10.231,28.800 SAY "Valor " + CHR(13) + ;
+		"antiguedad (%)" ;
+	SIZE 2.000,14.600, 0.000 ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(0,255,0,0,128,128)
+@ 5.385,0.000 SAY "C.U.I.L." ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(0,255,0,0,128,128)
+@ 8.154,57.600 SAY "Presentismo (%)" ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(0,255,0,0,128,128)
+@ 2.462,18.400 GET m.nombre ;
+	SIZE 1.000,32.800 ;
+	DEFAULT " " ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@!" ;
+	DISABLE
+@ 4.000,18.400 GET m.DNI ;
+	SIZE 1.000,15.800 ;
+	DEFAULT 0 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@K 99999999" ;
+	DISABLE
+@ 5.385,18.400 GET M.cuil ;
+	SIZE 1.000,17.400 ;
+	DEFAULT " " ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@K 99-99999999-9" ;
+	DISABLE
+@ 6.769,18.400 GET m.fechaingre ;
+	SIZE 1.000,14.600 ;
+	DEFAULT {  /  /  } ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@K" ;
+	DISABLE
+@ 8.846,18.400 GET m.categoria ;
+	SIZE 1.000,15.800 ;
+	DEFAULT " " ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@K!" ;
+	DISABLE
+@ 10.231,18.400 GET m.antiguedad ;
+	SIZE 1.000,6.400 ;
+	DEFAULT 0 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@K 99" ;
+	DISABLE
+@ 10.231,43.600 GET m.ant_porcen ;
+	SIZE 1.000,6.400 ;
+	DEFAULT " " ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@K 9.99" ;
+	DISABLE
+@ 12.308,18.400 GET m.hijos ;
+	SIZE 1.000,6.400 ;
+	DEFAULT 0 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@K 99" ;
+	DISABLE
+@ 13.692,18.000 GET m.tipodepago ;
+	PICTURE "@*C si - mensual / no- quincenal" ;
+	SIZE 1.308,30.833 ;
+	DEFAULT 0 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "B" ;
+	DISABLE ;
+	COLOR ,,,,,,,,RGB(0,255,0,0,128,128),RGB(0,255,0,0,128,128)
+@ 15.077,18.000 GET m.jor_o_sue ;
+	PICTURE "@*C si - sueldo / no - jornal" ;
+	SIZE 1.308,26.000 ;
+	DEFAULT 0 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "B" ;
+	DISABLE ;
+	COLOR ,,,,,,,,RGB(0,255,0,0,128,128),RGB(0,255,0,0,128,128)
+@ 16.462,18.400 GET m.valor ;
+	SIZE 1.000,11.200 ;
+	DEFAULT 0 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "9999.99" ;
+	DISABLE
+@ 1.231,77.800 GET m.horasextra ;
+	SIZE 1.000,10.000 ;
+	DEFAULT 0 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@K 999.99" ;
+	DISABLE
+@ 2.615,77.800 GET m.horasnoct ;
+	SIZE 1.000,10.000 ;
+	DEFAULT 0 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@K 999.99" ;
+	DISABLE
+@ 4.000,77.800 GET m.horasferia ;
+	SIZE 1.000,10.000 ;
+	DEFAULT 0 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@K 999.99" ;
+	DISABLE
+@ 5.385,77.800 GET m.obrasocial ;
+	SIZE 1.000,6.400 ;
+	DEFAULT 0 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@K 9.99" ;
+	DISABLE
+@ 6.769,77.800 GET m.cuotasindi ;
+	SIZE 1.000,6.400 ;
+	DEFAULT 0 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@K 9.99" ;
+	DISABLE
+@ 8.154,77.800 GET m.presentmo ;
+	SIZE 1.000,6.400 ;
+	DEFAULT 0 ;
+	FONT "MS Sans Serif", 8 ;
+	DISABLE
+@ 12.462,57.600 GET m.ver_empledor ;
+	PICTURE "@*HN VER EMPLEADORES..." ;
+	SIZE 1.154,25.667,0.500 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "B" ;
+	VALID _s870vc4d4() ;
+	DISABLE
+@ 9.538,77.800 SAY m.cod_empdor ;
+	SIZE 1.000,6.400 ;
+	FONT "MS Sans Serif", 8
+@ 0.769,18.400 SAY m.codigo ;
+	SIZE 1.000,6.400 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@L"
+@ 18.000,50.400 GET m.ACEPTAR ;
+	PICTURE "@*VN ACEPTAR;CANCELAR" ;
+	SIZE 1.692,12.167,0.308 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "B" ;
+	VALID _s870vc4du() ;
+	DISABLE
+@ 15.231,50.400 GET m.ACCION ;
+	PICTURE "@*BHN " + ;
+		(LOCFILE("..\wizards\wizbmps\wznew.bmp","BMP|ICO|PCT|ICN","¿Dónde está wznew?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzdelete.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzdelete?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzedit.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzedit?")) ;
+	SIZE 2.077,12.600,0.800 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	VALID _s870vc4hx()
+@ 19.385,0.000 GET m.movimiento ;
+	PICTURE "@*BHN " + ;
+		(LOCFILE("..\wizards\wizbmps\wztop.bmp","BMP|ICO|PCT|ICN","¿Dónde está wztop?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzback.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzback?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzlocate.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzlocate?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wznext.bmp","BMP|ICO|PCT|ICN","¿Dónde está wznext?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzend.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzend?")) ;
+	SIZE 2.154,8.400,0.800 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	VALID _s870vc4jc()
+@ 17.846,0.600 GET M.ORDEN ;
+	PICTURE "@*RHN CODIGO;NOMBRE;DNI" ;
+	SIZE 1.308,13.333,0.333 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "BT" ;
+	VALID _s870vc4jx() ;
+	COLOR ,,,,,,,,RGB(255,0,0,,,,),RGB(255,0,0,,,,)
+@ 18.000,66.800 GET m.salir ;
+	PICTURE "@*BHT " + ;
+		(LOCFILE("..\wizards\wizbmps\wzclose.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzclose?")) ;
+	SIZE 3.538,23.400,0.800 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8
+@ 10.923,58.000 SAY Empledor.nombre ;
+	SIZE 1.000,29.800 ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(,,,255,255,255)
+
+IF NOT WVISIBLE("empleados")
+	ACTIVATE WINDOW empleados
+ENDIF
+
+READ CYCLE MODAL ;
+	SHOW _s870vc4kq()
+
+RELEASE WINDOW empleados
+
+*       *********************************************************
+*       *                                                         
+*       *             Windows Cerrando bases de datos             
+*       *                                                         
+*       *********************************************************
+*
+
+IF USED("empleado")
+	SELECT empleado
+	USE
+ENDIF
+
+IF USED("empledor")
+	SELECT empledor
+	USE
+ENDIF
+
+SELECT (m.currarea)
+
+
+#REGION 0
+
+SET READBORDER &rborder
+
+IF m.talkstat = "ON"
+	SET TALK ON
+ENDIF
+IF m.compstat = "ON"
+	SET COMPATIBLE ON
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC4D4           m.ver_empledor VALID               
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         EMPLEADO,     Record Number:   40  
+*       * Variable:            m.ver_empledor                     
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      1                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc4d4     &&  m.ver_empledor VALID
+#REGION 1
+select empledor
+browse nodelete nomodify noappend normal title "SELECCIONE AL EMPLEADOR"
+m.cod_empdor = empledor.codigo
+select empleado
+show gets
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC4DU           m.ACEPTAR VALID                    
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         EMPLEADO,     Record Number:   43  
+*       * Variable:            m.ACEPTAR                          
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      2                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc4du     &&  m.ACEPTAR VALID
+#REGION 1
+IF M.ACEPTAR = 1
+	DO CASE
+	CASE M.ACCION = 1
+			IF M.NOMBRE = "  "
+				WAIT WINDOW NOWAIT "ESCRIBA EL NOMBRE"
+				_CUROBJ = 1
+				RETURN
+			ENDIF
+			IF M.DNI > 0
+				SET ORDER TO 3
+				SEEK M.DNI
+				IF FOUND()
+					WAIT WINDOW NOWAIT "DNI REPETIDO"
+					_CUROBJ = 2
+					SHOW GET m.dni
+					RETURN
+				ENDIF
+			ELSE
+				WAIT WINDOW NOWAIT "ESCRIBA EL DNI"
+				_CUROBJ = 2
+				SHOW GET m.dni
+				RETURN
+			ENDIF
+
+			IF EMPTY(M.fechaingre)
+				WAIT WINDOW NOWAIT "ESCRIBA LA FECHA DE INGRESO"
+				_curobj = 3
+				show get m.fechaingre
+				return
+			ENDIF
+			IF M.VALOR <= 0
+				WAIT WINDOW NOWAIT "ESCRIBA EL VALOR"
+				_curobj = 12
+				show get m.valor
+				return
+			endif
+			if m.tipodepago = .f. .and. m.jor_o_sue = .t.
+				WAIT WINDOW NOWAIT "EL SUELDO NO PUEDE SER QUINCENAL"
+				_curobj = 10
+				return
+			endif
+			IF M.cod_empdor = 0
+				WAIT WINDOW NOWAIT "SELECCIONE UN EMPLEADOR"
+				_curobj = 19
+				return
+			endif
+			
+			m.hijos = abs(m.hijos)
+			m.antiguedad = abs(m.antiguedad)
+			m.horasextra = abs(m.horasextra)
+			m.horasnoct = abs(m.horasnoct)
+			m.horasferia = abs(m.horasferia)
+			m.obrasocial = abs(m.obrasocial)
+			m.cuotasindi = abs(m.cuotasindi)
+
+			INSERT INTO empleado FROM MEMVAR
+			SHOW GETS DISABLE
+			SHOW GET M.ACCION ENABLE
+			SHOW GET M.MOVIMIENTO ENABLE
+			SHOW GET M.ACEPTAR DISABLE
+			SHOW GET M.ORDEN ENABLE
+			SHOW GET M.SALIR ENABLE
+
+	CASE M.ACCION = 3
+		IF M.NOMBRE = "  "
+			WAIT WINDOW NOWAIT "ESCRIBA EL NOMBRE"
+			_CUROBJ = 1
+			RETURN
+		ENDIF
+		GOTO RECNUM
+		IF M.DNI > 0
+			IF M.DNI <> DNI
+				SET ORDER TO 3
+				SEEK M.DNI
+				IF FOUND()
+					WAIT WINDOW NOWAIT "DNI REPETIDO"
+					_CUROBJ = 2
+					SHOW GET m.dni
+					RETURN
+				ENDIF
+			ENDIF
+		ELSE
+			WAIT WINDOW NOWAIT "ESCRIBA EL DNI"
+			_CUROBJ = 2
+			SHOW GET m.dni
+			RETURN
+		ENDIF
+		IF EMPTY(M.fechaingre)
+			WAIT WINDOW NOWAIT "ESCRIBA LA FECHA DE INGRESO"
+			_curobj = 3
+			show get m.fechaingre
+			return
+		ENDIF
+		IF M.VALOR <= 0
+			WAIT WINDOW NOWAIT "ESCRIBA EL VALOR"
+			_curobj = 12
+			show get m.valor
+			return
+		endif
+		if m.tipodepago = .f. .and. m.jor_o_sue = .t.
+			WAIT WINDOW NOWAIT "EL SUELDO NO PUEDE SER QUINCENAL"
+			_curobj = 10
+			return
+		endif
+		IF M.cod_empdor = 0
+			WAIT WINDOW NOWAIT "SELECCIONE UN EMPLEADOR"
+			_curobj = 19
+			return
+		endif
+			
+			m.hijos = abs(m.hijos)
+			m.antiguedad = abs(m.antiguedad)
+			m.horasextra = abs(m.horasextra)
+			m.horasnoct = abs(m.horasnoct)
+			m.horasferia = abs(m.horasferia)
+			m.obrasocial = abs(m.obrasocial)
+			m.cuotasindi = abs(m.cuotasindi)
+
+						
+		GOTO RECNUM
+		GATHER MEMVAR
+		SHOW GETS DISABLE
+		SHOW GET M.ACCION ENABLE
+		SHOW GET M.MOVIMIENTO ENABLE
+		SHOW GET M.ACEPTAR DISABLE
+		SHOW GET M.ORDEN ENABLE
+		SHOW GET M.SALIR ENABLE
+		SKIP
+		SKIP - 1
+			
+ENDCASE
+ELSE
+	SHOW GETS DISABLE
+	SHOW GET M.ACCION ENABLE
+	SHOW GET M.MOVIMIENTO ENABLE
+	SHOW GET M.ACEPTAR DISABLE
+	SHOW GET M.SALIR ENABLE
+	SHOW GET M.ORDEN ENABLE
+ENDIF
+set order to ORDEN
+SHOW GETS
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC4HX           m.ACCION VALID                     
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         EMPLEADO,     Record Number:   44  
+*       * Variable:            m.ACCION                           
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      3                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc4hx     &&  m.ACCION VALID
+#REGION 1
+DO CASE
+CASE M.ACCION = 1
+
+	SCATTER MEMVAR BLANK
+	set order to 1
+	if reccount() = 0
+		m.codigo = 1
+	else
+		go bottom
+		m.codigo = codigo + 1
+	endif
+	SHOW GETS ENABLE
+	SHOW GET M.ACCION DISABLE
+	SHOW GET M.MOVIMIENTO DISABLE
+	SHOW GET M.SALIR DISABLE
+	SHOW GET M.ORDEN DISABLE
+	_CUROBJ = 1
+CASE M.ACCION = 2
+	DO BORRemp.SPR
+	scatter memvar
+CASE M.ACCION = 3
+	SHOW GETS ENABLE
+	SHOW GET M.ACCION DISABLE
+	SHOW GET M.MOVIMIENTO DISABLE
+	SHOW GET M.SALIR DISABLE
+	SHOW GET M.ORDEN DISABLE
+	SCATTER MEMVAR
+	RECNUM = RECNO()
+	_curobj = 1
+ENDCASE
+show gets
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC4JC           m.movimiento VALID                 
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         EMPLEADO,     Record Number:   45  
+*       * Variable:            m.movimiento                       
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      4                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc4jc     &&  m.movimiento VALID
+#REGION 1
+SELECT EMPLEADO
+DO P_MUEVE
+show gets
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC4JX           M.ORDEN VALID                      
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         EMPLEADO,     Record Number:   46  
+*       * Variable:            M.ORDEN                            
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Radio Button                       
+*       * Snippet Number:      5                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc4jx     &&  M.ORDEN VALID
+#REGION 1
+SET ORDER TO ORDEN
+SHOW GETS
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC4KQ           Nivel de lectura SHOW              
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         EMPLEADO                           
+*       * Called By:           READ Statement                     
+*       * Snippet Number:      6                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc4kq     && Read Level Show
+PRIVATE currwind
+STORE WOUTPUT() TO currwind
+*
+* Código SHOW de la pantalla: EMPLEADO
+*
+#REGION 1
+IF SYS(2016) = "EMPLEADOS" OR SYS(2016) = "*"
+	ACTIVATE WINDOW empleados SAME
+	@ 9.538,77.800 SAY m.cod_empdor ;
+		SIZE 1.000,6.400, 0.000 ;
+		FONT "MS Sans Serif", 8
+	@ 0.769,18.400 SAY m.codigo ;
+		SIZE 1.000,6.400, 0.000 ;
+		FONT "MS Sans Serif", 8 ;
+		PICTURE "@L"
+	@ 10.923,58.000 SAY Empledor.nombre ;
+		SIZE 1.000,29.800, 0.000 ;
+		FONT "MS Sans Serif", 8 ;
+		COLOR RGB(,,,255,255,255)
+ENDIF
+IF NOT EMPTY(currwind)
+	ACTIVATE WINDOW (currwind) SAME
+ENDIF

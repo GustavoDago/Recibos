@@ -1,0 +1,132 @@
+*       *********************************************************
+*       *                                                         
+*       * 30/09/98            MOSTLOCA.SPR               17:37:12 
+*       *                                                         
+*       *********************************************************
+*       *                                                         
+*       * Nombre del autor                                        
+*       *                                                         
+*       * Copyright (c) 1998 Nombre de la empresa                 
+*       * Dirección                                               
+*       * Ciudad,     C.P.                                        
+*       * País                                              
+*       *                                                         
+*       * Description:                                            
+*       * Este programa lo ha generado automáticamente GENSCRN.    
+*       *                                                         
+*       *********************************************************
+
+
+#REGION 0
+REGIONAL m.currarea, m.talkstat, m.compstat
+
+IF SET("TALK") = "ON"
+	SET TALK OFF
+	m.talkstat = "ON"
+ELSE
+	m.talkstat = "OFF"
+ENDIF
+m.compstat = SET("COMPATIBLE")
+SET COMPATIBLE FOXPLUS
+
+m.rborder = SET("READBORDER")
+SET READBORDER ON
+
+*       *********************************************************
+*       *                                                         
+*       *             Windows Definiciones de ventana             
+*       *                                                         
+*       *********************************************************
+*
+
+IF NOT WEXIST("most_loca") ;
+	OR UPPER(WTITLE("MOST_LOCA")) == "MOST_LOCA.PJX" ;
+	OR UPPER(WTITLE("MOST_LOCA")) == "MOST_LOCA.SCX" ;
+	OR UPPER(WTITLE("MOST_LOCA")) == "MOST_LOCA.MNX" ;
+	OR UPPER(WTITLE("MOST_LOCA")) == "MOST_LOCA.PRG" ;
+	OR UPPER(WTITLE("MOST_LOCA")) == "MOST_LOCA.FRX" ;
+	OR UPPER(WTITLE("MOST_LOCA")) == "MOST_LOCA.QPR"
+	DEFINE WINDOW most_loca ;
+		AT 0.000, 0.000 ;
+		SIZE 19.688,33.714 ;
+		TITLE "LISTA DE LOCALIDADES" ;
+		FONT "MS Sans Serif", 8 ;
+		FLOAT ;
+		NOCLOSE ;
+		MINIMIZE ;
+		SYSTEM ;
+		COLOR RGB(,,,128,128,128)
+ENDIF
+
+
+#REGION 1
+DEFINE POPUP _ryn11rkny ;
+	PROMPT FIELD Localida.localidad ;
+	SCROLL
+
+*       *********************************************************
+*       *                                                         
+*       *        MOSTLOCA/Windows Distribución de pantalla        
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+IF WVISIBLE("most_loca")
+	ACTIVATE WINDOW most_loca SAME
+ELSE
+	ACTIVATE WINDOW most_loca NOSHOW
+ENDIF
+@ 1.000,4.429 SAY "SELECCIONE LOCALIDAD" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T"
+@ 3.750,1.571 GET M.LOCAL ;
+ 	PICTURE "@&N" ;
+	POPUP _ryn11rkny ;
+	SIZE 15.750,31.000 ;
+	DEFAULT " " ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "" ;
+	WHEN _ryn11rkoq() ;
+	DISABLE
+
+IF NOT WVISIBLE("most_loca")
+	ACTIVATE WINDOW most_loca
+ENDIF
+
+READ CYCLE
+
+RELEASE WINDOW most_loca
+RELEASE POPUPS _ryn11rkny
+
+#REGION 0
+
+SET READBORDER &rborder
+
+IF m.talkstat = "ON"
+	SET TALK ON
+ENDIF
+IF m.compstat = "ON"
+	SET COMPATIBLE ON
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       * _RYN11RKOQ           M.LOCAL WHEN                       
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         MOSTLOCA,     Record Number:    3  
+*       * Variable:            M.LOCAL                            
+*       * Called By:           WHEN Clause                        
+*       * Object Type:         List                               
+*       * Snippet Number:      1                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _ryn11rkoq     &&  M.LOCAL WHEN
+#REGION 1
+M.CODLUGAR= LOCALIDA.COD_POSTAL
+SHOW GETS

@@ -1,0 +1,524 @@
+*       *********************************************************
+*       *                                                         
+*       * 07/09/99            EMPLEDOR.SPR               14:37:14 
+*       *                                                         
+*       *********************************************************
+*       *                                                         
+*       * Gustavo Dagoberto                                       
+*       *                                                         
+*       * Copyright (c) 1999 Gusmafer                             
+*       * Dirección                                               
+*       * Ciudad,     C.P.                                        
+*       * País                                              
+*       *                                                         
+*       * Description:                                            
+*       * Este programa lo ha generado automáticamente GENSCRN.    
+*       *                                                         
+*       *********************************************************
+
+
+#REGION 0
+REGIONAL m.currarea, m.talkstat, m.compstat
+
+IF SET("TALK") = "ON"
+	SET TALK OFF
+	m.talkstat = "ON"
+ELSE
+	m.talkstat = "OFF"
+ENDIF
+m.compstat = SET("COMPATIBLE")
+SET COMPATIBLE FOXPLUS
+
+m.rborder = SET("READBORDER")
+SET READBORDER ON
+
+m.currarea = SELECT()
+
+
+*       *********************************************************
+*       *                                                         
+*       *  S2634189/Windows Bases de datos, índices, relaciones   
+*       *                                                         
+*       *********************************************************
+*
+
+IF USED("empledor")
+	SELECT empledor
+	SET ORDER TO TAG "codigo"
+ELSE
+	SELECT 0
+	USE (LOCFILE("empledor.dbf","DBF","Buscar  empledor?"));
+		AGAIN ALIAS empledor ;
+		ORDER TAG "codigo"
+ENDIF
+
+IF USED("localida")
+	SELECT localida
+	SET ORDER TO TAG "cod_postal"
+ELSE
+	SELECT 0
+	USE (LOCFILE("localida.dbf","DBF","Buscar  localida?"));
+		AGAIN ALIAS localida ;
+		ORDER TAG "cod_postal"
+ENDIF
+
+SELECT empledor
+
+SET RELATION OFF INTO localida
+SET RELATION TO empledor.codlugar INTO localida ADDITIVE
+
+SELECT empledor
+
+*       *********************************************************
+*       *                                                         
+*       *             Windows Definiciones de ventana             
+*       *                                                         
+*       *********************************************************
+*
+
+IF NOT WEXIST("empleador") ;
+	OR UPPER(WTITLE("EMPLEADOR")) == "EMPLEADOR.PJX" ;
+	OR UPPER(WTITLE("EMPLEADOR")) == "EMPLEADOR.SCX" ;
+	OR UPPER(WTITLE("EMPLEADOR")) == "EMPLEADOR.MNX" ;
+	OR UPPER(WTITLE("EMPLEADOR")) == "EMPLEADOR.PRG" ;
+	OR UPPER(WTITLE("EMPLEADOR")) == "EMPLEADOR.FRX" ;
+	OR UPPER(WTITLE("EMPLEADOR")) == "EMPLEADOR.QPR"
+	DEFINE WINDOW empleador ;
+		AT 4.000, 17.000 ;
+		SIZE 16.000,70.200 ;
+		TITLE "Manejo de empleadores" ;
+		FONT "MS Sans Serif", 8 ;
+		FLOAT ;
+		CLOSE ;
+		NOMINIMIZE ;
+		SYSTEM ;
+		FILL FILE LOCFILE("FONDOR~1.BMP","BMP|ICO|PCT|ICN", ;
+			"¿Dónde está fondor~1?")
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       *  EMPLEDOR/Windows Código de configuración - SECCION 2   
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+scatter memvar
+numrec = 0
+
+*       *********************************************************
+*       *                                                         
+*       *        EMPLEDOR/Windows Distribución de pantalla        
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+IF WVISIBLE("empleador")
+	ACTIVATE WINDOW empleador SAME
+ELSE
+	ACTIVATE WINDOW empleador NOSHOW
+ENDIF
+@ 12.000,0.000 TO 13.923,50.600 ;
+	PATTERN 1 ;
+	PEN 1, 0 ;
+	COLOR RGB(,,,255,255,255)
+@ 2.846,0.600 SAY " Apellido y Nombre " ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(0,0,0,255,255,255)
+@ 6.769,0.400 SAY " CUIT " ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(0,0,0,255,255,255)
+@ 1.000,0.600 SAY " Codigo " ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(0,0,0,255,255,255)
+@ 4.538,0.600 SAY " Dirección " ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(,,,255,255,255)
+@ 8.231,0.200 SAY " lugar de pago " ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(,,,255,255,255)
+@ 2.846,19.600 GET m.nombre ;
+	SIZE 1.000,32.800 ;
+	DEFAULT " " ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@K!" ;
+	DISABLE
+@ 4.692,19.600 GET m.direccion ;
+	SIZE 1.000,32.800 ;
+	DEFAULT " " ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@K!" ;
+	DISABLE
+@ 6.538,19.600 GET m.cuit ;
+	SIZE 1.000,17.200 ;
+	DEFAULT " " ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@K ##-########-#" ;
+	DISABLE
+@ 10.154,19.200 GET m.ver_lo ;
+	PICTURE "@*HN Ver localidades..." ;
+	SIZE 1.154,18.667,0.667 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "B" ;
+	VALID _s870vc4wa() ;
+	DISABLE
+@ 1.000,19.600 SAY m.codigo ;
+	SIZE 1.000,4.800 ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(,,,255,255,255)
+@ 8.385,19.600 SAY m.codlugar ;
+	SIZE 1.000,6.400 ;
+	FONT "MS Sans Serif", 8
+@ 0.000,55.000 GET m.ACCION ;
+	PICTURE "@*BVN " + ;
+		(LOCFILE("..\wizards\wizbmps\wznew.bmp","BMP|ICO|PCT|ICN","¿Dónde está wznew?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzdelete.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzdelete?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzedit.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzedit?")) ;
+	SIZE 2.000,14.800,0.308 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	VALID _s870vc4x8()
+@ 7.385,55.200 GET m.ACEPTAR ;
+	PICTURE "@*VN ACEPTAR;CANCELAR" ;
+	SIZE 2.077,12.000,0.308 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "B" ;
+	VALID _s870vc4y6() ;
+	DISABLE
+@ 13.846,0.000 GET m.movimiento ;
+	PICTURE "@*BHN " + ;
+		(LOCFILE("..\wizards\wizbmps\wztop.bmp","BMP|ICO|PCT|ICN","¿Dónde está wztop?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzback.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzback?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzlocate.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzlocate?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wznext.bmp","BMP|ICO|PCT|ICN","¿Dónde está wznext?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzend.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzend?")) ;
+	SIZE 2.000,9.400,0.800 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	VALID _s870vc512()
+@ 12.077,1.200 GET M.ORDEN ;
+	PICTURE "@*RHN CODIGO;NOMBRE" ;
+	SIZE 1.308,13.333,0.667 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "BT" ;
+	VALID _s870vc51l() ;
+	COLOR ,,,,,,,,RGB(255,0,0,,,,),RGB(255,0,0,,,,)
+@ 12.000,55.200 GET m.salir ;
+	PICTURE "@*BHT " + ;
+		(LOCFILE("..\wizards\wizbmps\wzclose.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzclose?")) ;
+	SIZE 3.769,14.600,0.800 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8
+@ 8.385,29.200 SAY Localida.localidad ;
+	SIZE 1.000,23.200 ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(,,,255,255,255)
+@ 0.000,0.000 TO 16.000,70.200 ;
+	PEN 2, 8
+
+IF NOT WVISIBLE("empleador")
+	ACTIVATE WINDOW empleador
+ENDIF
+
+READ CYCLE MODAL ;
+	SHOW _s870vc52f()
+
+RELEASE WINDOW empleador
+
+*       *********************************************************
+*       *                                                         
+*       *             Windows Cerrando bases de datos             
+*       *                                                         
+*       *********************************************************
+*
+
+IF USED("empledor")
+	SELECT empledor
+	USE
+ENDIF
+
+IF USED("localida")
+	SELECT localida
+	USE
+ENDIF
+
+SELECT (m.currarea)
+
+
+#REGION 0
+
+SET READBORDER &rborder
+
+IF m.talkstat = "ON"
+	SET TALK ON
+ENDIF
+IF m.compstat = "ON"
+	SET COMPATIBLE ON
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC4WA           m.ver_lo VALID                     
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         EMPLEDOR,     Record Number:   14  
+*       * Variable:            m.ver_lo                           
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      1                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc4wa     &&  m.ver_lo VALID
+#REGION 1
+select localida
+browse nomodify nodelete noappend
+m.codlugar = localida.cod_postal
+select empledor
+show gets
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC4X8           m.ACCION VALID                     
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         EMPLEDOR,     Record Number:   17  
+*       * Variable:            m.ACCION                           
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      2                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc4x8     &&  m.ACCION VALID
+#REGION 1
+DO CASE
+CASE M.ACCION = 1
+	SCATTER MEMO MEMVAR BLANK
+	SHOW GETS ENABLE
+	SHOW GET M.ACCION DISABLE
+	SHOW GET M.MOVIMIENTO DISABLE
+	SHOW GET M.SALIR DISABLE
+	SHOW GET M.ORDEN DISABLE
+	SET ORDER TO 1
+	GO BOTTOM
+	M.CODIGO = EMPLEDOR.CODIGO + 1
+	_CUROBJ = 1
+CASE M.ACCION = 2
+	do boempdr.SPR
+	SHOW GETS
+CASE M.ACCION = 3
+	SHOW GETS ENABLE
+	SHOW GET M.ACCION DISABLE
+	SHOW GET M.MOVIMIENTO DISABLE
+	SHOW GET M.SALIR DISABLE
+	SHOW GET M.ORDEN DISABLE
+	SCATTER MEMO MEMVAR
+	NUMREC = RECNO()
+	_CUROBJ = 1
+ENDCASE
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC4Y6           m.ACEPTAR VALID                    
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         EMPLEDOR,     Record Number:   18  
+*       * Variable:            m.ACEPTAR                          
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      3                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc4y6     &&  m.ACEPTAR VALID
+#REGION 1
+IF M.ACEPTAR = 1
+	DO CASE
+	CASE M.ACCION = 1
+	
+		SET ORDER TO 2
+		IF M.NOMBRE = "  "
+			WAIT WINDOW NOWAIT "ESCRIBA EL NOMBRE"
+			_CUROBJ = 2
+			RETURN
+		ENDIF
+		
+		IF M.CUIT > "  -        - "
+			SET ORDER TO 3
+			SEEK M.CUIT
+			IF FOUND()
+				WAIT WINDOW NOWAIT "CUIT REPETIDO"
+				_CUROBJ = 3
+				RETURN
+			ENDIF
+		ELSE
+			WAIT WINDOW NOWAIT "ESCRIBA EL CUIT"
+			_CUROBJ = 3
+			RETURN
+		ENDIF
+
+		IF M.CODLUGAR = 0
+			WAIT WINDOW NOWAIT "SELECCIONE UNA LOCALIDAD"
+			RETURN
+		ENDIF
+
+		INSERT INTO Empledor FROM MEMVAR
+		SHOW GETS DISABLE
+		SHOW GET M.ACCION ENABLE
+		SHOW GET M.MOVIMIENTO ENABLE
+		SHOW GET M.ACEPTAR DISABLE
+		SHOW GET M.ORDEN ENABLE
+		SHOW GET M.SALIR ENABLE
+
+	CASE M.ACCION = 3
+		
+		IF M.CUIT > "  -        - "
+				IF M.CUIT <> CUIT
+					SET ORDER TO 3
+					SEEK M.CUIT
+					IF FOUND()
+						WAIT WINDOW NOWAIT "CUIT REPETIDO"
+						_CUROBJ = 3
+						return
+					ENDIF
+				ENDIF
+		ELSE
+			WAIT WINDOW NOWAIT "ESCRIBA EL CUIT"
+			_CUROBJ = 3
+			return
+		ENDIF
+
+		IF M.CODlugar = 0
+			WAIT WINDOW NOWAIT "SELECCIONE UNA LOCALIDAD"
+			return
+		ENDIF
+				
+		go numrec
+		IF M.NOMBRE > "    "	
+			IF M.NOMBRE <> NOMBRE
+				set order to 2
+				seek m.nombre
+				if found()
+					wait window NOWAIT " YA EXISTE ESE NOMBRE "
+					_CUROBJ = 2
+					return
+				ENDIF
+			ENDIF
+		ELSE
+			WAIT WINDOW NOWAIT "ESCRIBA EL NOMBRE"
+			_CUROBJ = 2
+			return
+		ENDIF
+		
+		go numrec
+		GATHER MEMVAR
+		SHOW GETS DISABLE
+		SHOW GET M.ACCION ENABLE
+		SHOW GET M.MOVIMIENTO ENABLE
+		SHOW GET M.ACEPTAR DISABLE
+		SHOW GET M.ORDEN ENABLE
+		SHOW GET M.SALIR ENABLE
+	ENDCASE
+ELSE
+	SHOW GETS DISABLE
+	SHOW GET M.ACCION ENABLE
+	SHOW GET M.MOVIMIENTO ENABLE
+	SHOW GET M.ACEPTAR DISABLE
+	SHOW GET M.SALIR ENABLE
+	SHOW GET M.ORDEN ENABLE
+ENDIF
+set order to ORDEN
+SHOW GETS
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC512           m.movimiento VALID                 
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         EMPLEDOR,     Record Number:   19  
+*       * Variable:            m.movimiento                       
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      4                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc512     &&  m.movimiento VALID
+#REGION 1
+DO P_MUEVE
+show gets
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC51L           M.ORDEN VALID                      
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         EMPLEDOR,     Record Number:   20  
+*       * Variable:            M.ORDEN                            
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Radio Button                       
+*       * Snippet Number:      5                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc51l     &&  M.ORDEN VALID
+#REGION 1
+SET ORDER TO ORDEN
+SHOW GETS
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC52F           Nivel de lectura SHOW              
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         EMPLEDOR                           
+*       * Called By:           READ Statement                     
+*       * Snippet Number:      6                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc52f     && Read Level Show
+PRIVATE currwind
+STORE WOUTPUT() TO currwind
+*
+* Código SHOW de la pantalla: EMPLEDOR
+*
+#REGION 1
+IF SYS(2016) = "EMPLEADOR" OR SYS(2016) = "*"
+	ACTIVATE WINDOW empleador SAME
+	@ 1.000,19.600 SAY m.codigo ;
+		SIZE 1.000,4.800, 0.000 ;
+		FONT "MS Sans Serif", 8 ;
+		COLOR RGB(,,,255,255,255)
+	@ 8.385,19.600 SAY m.codlugar ;
+		SIZE 1.000,6.400, 0.000 ;
+		FONT "MS Sans Serif", 8
+	@ 8.385,29.200 SAY Localida.localidad ;
+		SIZE 1.000,23.200, 0.000 ;
+		FONT "MS Sans Serif", 8 ;
+		COLOR RGB(,,,255,255,255)
+ENDIF
+IF NOT EMPTY(currwind)
+	ACTIVATE WINDOW (currwind) SAME
+ENDIF

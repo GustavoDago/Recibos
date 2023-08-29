@@ -1,0 +1,366 @@
+*       *********************************************************
+*       *                                                         
+*       * 30/09/98             RECIBOS.SPR               17:37:13 
+*       *                                                         
+*       *********************************************************
+*       *                                                         
+*       * Nombre del autor                                        
+*       *                                                         
+*       * Copyright (c) 1998 Nombre de la empresa                 
+*       * Dirección                                               
+*       * Ciudad,     C.P.                                        
+*       * País                                              
+*       *                                                         
+*       * Description:                                            
+*       * Este programa lo ha generado automáticamente GENSCRN.    
+*       *                                                         
+*       *********************************************************
+
+
+#REGION 0
+REGIONAL m.currarea, m.talkstat, m.compstat
+
+IF SET("TALK") = "ON"
+	SET TALK OFF
+	m.talkstat = "ON"
+ELSE
+	m.talkstat = "OFF"
+ENDIF
+m.compstat = SET("COMPATIBLE")
+SET COMPATIBLE FOXPLUS
+
+m.rborder = SET("READBORDER")
+SET READBORDER ON
+
+*       *********************************************************
+*       *                                                         
+*       *             Windows Definiciones de ventana             
+*       *                                                         
+*       *********************************************************
+*
+
+IF NOT WEXIST("recibos") ;
+	OR UPPER(WTITLE("RECIBOS")) == "RECIBOS.PJX" ;
+	OR UPPER(WTITLE("RECIBOS")) == "RECIBOS.SCX" ;
+	OR UPPER(WTITLE("RECIBOS")) == "RECIBOS.MNX" ;
+	OR UPPER(WTITLE("RECIBOS")) == "RECIBOS.PRG" ;
+	OR UPPER(WTITLE("RECIBOS")) == "RECIBOS.FRX" ;
+	OR UPPER(WTITLE("RECIBOS")) == "RECIBOS.QPR"
+	DEFINE WINDOW recibos ;
+		AT 0.000, 10.000 ;
+		SIZE 29.615,98.400 ;
+		TITLE "Visor de recibos" ;
+		FONT "MS Sans Serif", 8 ;
+		FLOAT ;
+		CLOSE ;
+		NOMINIMIZE ;
+		SYSTEM ;
+		COLOR RGB(,,,192,192,192)
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       *   RECIBOS/Windows Código de configuración - SECCION 2   
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+SCATTER MEMVAR
+
+
+*       *********************************************************
+*       *                                                         
+*       *        RECIBOS/Windows Distribución de pantalla         
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+IF WVISIBLE("recibos")
+	ACTIVATE WINDOW recibos SAME
+ELSE
+	ACTIVATE WINDOW recibos NOSHOW
+ENDIF
+@ 1.846,27.400 SAY "Recibos" ;
+	PICTURE "@I" ;
+	FONT "GeoSlab703 MdCn BT", 24 ;
+	STYLE "B" ;
+	COLOR RGB(128,0,0,192,192,192)
+@ 7.462,4.800 SAY "Fecha" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,0,,,,)
+@ 21.308,4.800 SAY "Total" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,0,,,,)
+@ 5.615,4.800 SAY "Código Empleado" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,0,,,,)
+@ 9.308,4.800 SAY "Código Recibo" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T"
+@ 5.615,55.200 SAY "Período abonado" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T"
+@ 7.462,24.400 SAY Recibos.fecha ;
+	SIZE 1.000,16.000 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@!"
+@ 9.308,24.400 SAY Recibos.cod_recibo ;
+	SIZE 1.000,16.000 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@!"
+@ 21.308,24.400 SAY Recibos.total ;
+	SIZE 1.000,16.000 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "##-########-#"
+@ 5.615,24.400 SAY Recibos.cod_empado ;
+	SIZE 1.000,6.400 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@L"
+@ 5.615,74.800 SAY Recibos.per_abo ;
+	SIZE 1.000,9.000 ;
+	FONT "MS Sans Serif", 8
+@ 24.923,7.200 GET m.movimiento ;
+	PICTURE "@*BHN " + ;
+		(LOCFILE("wizards\wizbmps\wztop.bmp","BMP|ICO|PCT|ICN","¿Dónde está wztop?")) + ";" + ;
+		(LOCFILE("wizards\wizbmps\wzback.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzback?")) + ";" + ;
+		(LOCFILE("wizards\wizbmps\wzlocate.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzlocate?")) + ";" + ;
+		(LOCFILE("wizards\wizbmps\wznext.bmp","BMP|ICO|PCT|ICN","¿Dónde está wznext?")) + ";" + ;
+		(LOCFILE("wizards\wizbmps\wzend.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzend?")) ;
+	SIZE 2.615,12.200,0.800 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	VALID _ryn11rlp3()
+@ 15.769,55.200 GET M.ORDEN ;
+	PICTURE "@*RVN CODIGO EMPLEADO;FECHA" ;
+	SIZE 1.308,24.000,0.308 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "BT" ;
+	VALID _ryn11rlpm() ;
+	COLOR ,,,,,,,,RGB(255,0,0,,,,),RGB(255,0,0,,,,)
+@ 24.000,76.800 GET m.salir ;
+	PICTURE "@*BHT " + ;
+		(LOCFILE("wizards\wizbmps\wzclose.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzclose?")) ;
+	SIZE 3.769,14.600,0.800 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8
+@ 1.462,93.400 TO 28.308,93.400 ;
+	PEN 2, 8 ;
+	COLOR RGB(128,128,128,128,128,128)
+@ 0.385,95.800 TO 29.308,95.800 ;
+	PEN 2, 8 ;
+	COLOR RGB(128,128,128,128,128,128)
+@ 0.231,0.800 TO 29.539,0.800 ;
+	PEN 2, 8 ;
+	COLOR RGB(255,255,255,255,255,255)
+@ 1.385,93.600 TO 28.000,93.600 ;
+	PEN 2, 8 ;
+	COLOR RGB(255,255,255,255,255,255)
+@ 28.231,3.600 TO 28.231,94.000 ;
+	PEN 2, 8 ;
+	STYLE "1" ;
+	COLOR RGB(128,128,128,128,128,128)
+@ 29.308,0.400 TO 29.308,96.000 ;
+	PEN 2, 8 ;
+	STYLE "1" ;
+	COLOR RGB(128,128,128,128,128,128)
+@ 0.154,1.400 TO 0.154,96.000 ;
+	PEN 2, 8 ;
+	STYLE "1" ;
+	COLOR RGB(128,128,128,128,128,128)
+@ 0.231,1.400 TO 0.231,96.200 ;
+	PEN 2, 8 ;
+	STYLE "1" ;
+	COLOR RGB(255,255,255,255,255,255)
+@ 28.308,3.600 TO 28.308,94.000 ;
+	PEN 2, 8 ;
+	STYLE "1" ;
+	COLOR RGB(255,255,255,255,255,255)
+@ 1.462,3.400 TO 28.385,3.400 ;
+	PEN 2, 8 ;
+	COLOR RGB(128,128,128,128,128,128)
+@ 1.308,3.600 TO 1.308,94.000 ;
+	PEN 2, 8 ;
+	STYLE "1" ;
+	COLOR RGB(128,128,128,128,128,128)
+@ 0.231,0.400 TO 29.539,0.400 ;
+	PEN 2, 8 ;
+	COLOR RGB(128,128,128,128,128,128)
+@ 7.462,55.200 SAY "Banco Depósito" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T"
+@ 7.462,74.800 SAY Recibos.banco_depo ;
+	SIZE 1.000,6.600 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "9999"
+@ 9.308,55.200 SAY "Período" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T"
+@ 11.154,55.200 SAY "Fecha deposito" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T"
+@ 9.308,74.800 SAY Recibos.periodo ;
+	SIZE 1.000,11.200 ;
+	FONT "MS Sans Serif", 8
+@ 11.154,74.800 SAY Recibos.fecha_depo ;
+	SIZE 1.000,10.200 ;
+	FONT "MS Sans Serif", 8
+@ 13.000,4.400 SAY "Total Haberes" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T"
+@ 14.846,4.400 SAY "Total Descuentos" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T"
+@ 16.692,4.400 SAY "Total Anticipos" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T"
+@ 18.538,4.400 SAY "Total Adicionales" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T"
+@ 13.000,24.400 SAY Recibos.tothaberes ;
+	SIZE 1.000,10.200 ;
+	FONT "MS Sans Serif", 8
+@ 14.846,24.400 SAY Recibos.totdescuen ;
+	SIZE 1.000,10.200 ;
+	FONT "MS Sans Serif", 8
+@ 16.692,24.400 SAY Recibos.totadicion ;
+	SIZE 1.000,10.200 ;
+	FONT "MS Sans Serif", 8
+@ 18.538,24.400 SAY Recibos.totanticip ;
+	SIZE 1.000,10.200 ;
+	FONT "MS Sans Serif", 8
+
+IF NOT WVISIBLE("recibos")
+	ACTIVATE WINDOW recibos
+ENDIF
+
+READ CYCLE ;
+	SHOW _ryn11rlus()
+
+RELEASE WINDOW recibos
+
+#REGION 0
+
+SET READBORDER &rborder
+
+IF m.talkstat = "ON"
+	SET TALK ON
+ENDIF
+IF m.compstat = "ON"
+	SET COMPATIBLE ON
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       * _RYN11RLP3           m.movimiento VALID                 
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         RECIBOS,     Record Number:   14   
+*       * Variable:            m.movimiento                       
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      1                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _ryn11rlp3     &&  m.movimiento VALID
+#REGION 1
+DO P_MUEVE
+
+*       *********************************************************
+*       *                                                         
+*       * _RYN11RLPM           M.ORDEN VALID                      
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         RECIBOS,     Record Number:   15   
+*       * Variable:            M.ORDEN                            
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Radio Button                       
+*       * Snippet Number:      2                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _ryn11rlpm     &&  M.ORDEN VALID
+#REGION 1
+SET ORDER TO ORDEN
+SHOW GETS
+
+*       *********************************************************
+*       *                                                         
+*       * _RYN11RLUS           Nivel de lectura SHOW              
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         RECIBOS                            
+*       * Called By:           READ Statement                     
+*       * Snippet Number:      3                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _ryn11rlus     && Read Level Show
+PRIVATE currwind
+STORE WOUTPUT() TO currwind
+*
+* Código SHOW de la pantalla: RECIBOS
+*
+#REGION 1
+IF SYS(2016) = "RECIBOS" OR SYS(2016) = "*"
+	ACTIVATE WINDOW recibos SAME
+	@ 7.462,24.400 SAY Recibos.fecha ;
+		SIZE 1.000,16.000, 0.000 ;
+		FONT "MS Sans Serif", 8 ;
+		PICTURE "@!"
+	@ 9.308,24.400 SAY Recibos.cod_recibo ;
+		SIZE 1.000,16.000, 0.000 ;
+		FONT "MS Sans Serif", 8 ;
+		PICTURE "@!"
+	@ 21.308,24.400 SAY Recibos.total ;
+		SIZE 1.000,16.000, 0.000 ;
+		FONT "MS Sans Serif", 8 ;
+		PICTURE "##-########-#"
+	@ 5.615,24.400 SAY Recibos.cod_empado ;
+		SIZE 1.000,6.400, 0.000 ;
+		FONT "MS Sans Serif", 8 ;
+		PICTURE "@L"
+	@ 5.615,74.800 SAY Recibos.per_abo ;
+		SIZE 1.000,9.000, 0.000 ;
+		FONT "MS Sans Serif", 8
+	@ 7.462,74.800 SAY Recibos.banco_depo ;
+		SIZE 1.000,6.600, 0.000 ;
+		FONT "MS Sans Serif", 8 ;
+		PICTURE "9999"
+	@ 9.308,74.800 SAY Recibos.periodo ;
+		SIZE 1.000,11.200, 0.000 ;
+		FONT "MS Sans Serif", 8
+	@ 11.154,74.800 SAY Recibos.fecha_depo ;
+		SIZE 1.000,10.200, 0.000 ;
+		FONT "MS Sans Serif", 8
+	@ 13.000,24.400 SAY Recibos.tothaberes ;
+		SIZE 1.000,10.200, 0.000 ;
+		FONT "MS Sans Serif", 8
+	@ 14.846,24.400 SAY Recibos.totdescuen ;
+		SIZE 1.000,10.200, 0.000 ;
+		FONT "MS Sans Serif", 8
+	@ 16.692,24.400 SAY Recibos.totadicion ;
+		SIZE 1.000,10.200, 0.000 ;
+		FONT "MS Sans Serif", 8
+	@ 18.538,24.400 SAY Recibos.totanticip ;
+		SIZE 1.000,10.200, 0.000 ;
+		FONT "MS Sans Serif", 8
+ENDIF
+IF NOT EMPTY(currwind)
+	ACTIVATE WINDOW (currwind) SAME
+ENDIF

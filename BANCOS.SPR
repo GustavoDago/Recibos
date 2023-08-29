@@ -1,0 +1,318 @@
+*       *********************************************************
+*       *                                                         
+*       * 07/09/99             BANCOS.SPR                14:37:18 
+*       *                                                         
+*       *********************************************************
+*       *                                                         
+*       * Gustavo Dagoberto                                       
+*       *                                                         
+*       * Copyright (c) 1999 Gusmafer                             
+*       * Dirección                                               
+*       * Ciudad,     C.P.                                        
+*       * País                                              
+*       *                                                         
+*       * Description:                                            
+*       * Este programa lo ha generado automáticamente GENSCRN.    
+*       *                                                         
+*       *********************************************************
+
+
+#REGION 0
+REGIONAL m.currarea, m.talkstat, m.compstat
+
+IF SET("TALK") = "ON"
+	SET TALK OFF
+	m.talkstat = "ON"
+ELSE
+	m.talkstat = "OFF"
+ENDIF
+m.compstat = SET("COMPATIBLE")
+SET COMPATIBLE FOXPLUS
+
+m.rborder = SET("READBORDER")
+SET READBORDER ON
+
+m.currarea = SELECT()
+
+
+*       *********************************************************
+*       *                                                         
+*       *   BANCOS/Windows Bases de datos, índices, relaciones    
+*       *                                                         
+*       *********************************************************
+*
+
+IF USED("banco")
+	SELECT banco
+	SET ORDER TO TAG "codigo"
+ELSE
+	SELECT 0
+	USE (LOCFILE("banco.dbf","DBF","Buscar  banco?"));
+		AGAIN ALIAS banco ;
+		ORDER TAG "codigo"
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       *             Windows Definiciones de ventana             
+*       *                                                         
+*       *********************************************************
+*
+
+IF NOT WEXIST("bancos") ;
+	OR UPPER(WTITLE("BANCOS")) == "BANCOS.PJX" ;
+	OR UPPER(WTITLE("BANCOS")) == "BANCOS.SCX" ;
+	OR UPPER(WTITLE("BANCOS")) == "BANCOS.MNX" ;
+	OR UPPER(WTITLE("BANCOS")) == "BANCOS.PRG" ;
+	OR UPPER(WTITLE("BANCOS")) == "BANCOS.FRX" ;
+	OR UPPER(WTITLE("BANCOS")) == "BANCOS.QPR"
+	DEFINE WINDOW bancos ;
+		AT 1.211, 8.429 ;
+		SIZE 22.692,86.200 ;
+		TITLE "manejo de bancos" ;
+		FONT "MS Sans Serif", 8 ;
+		FLOAT ;
+		CLOSE ;
+		NOMINIMIZE ;
+		SYSTEM ;
+		COLOR RGB(,,,255,255,255)
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       *   BANCOS/Windows Código de configuración - SECCION 2    
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+select banco
+set order to 1
+SEN = .F.
+M.codigo = 0
+nreg = 0
+GO TOP
+SCATTER MEMVAR
+
+
+*       *********************************************************
+*       *                                                         
+*       *         BANCOS/Windows Distribución de pantalla         
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+IF WVISIBLE("bancos")
+	ACTIVATE WINDOW bancos SAME
+ELSE
+	ACTIVATE WINDOW bancos NOSHOW
+ENDIF
+@ 1.308,27.000 SAY "BANCOS" ;
+	PICTURE "@I" ;
+	FONT "GeoSlab703 MdCn BT", 24 ;
+	STYLE "B" ;
+	COLOR RGB(0,0,0,255,255,255)
+@ 10.769,4.200 SAY "Banco" ;
+	FONT "MS Sans Serif", 12 ;
+	STYLE "BT" ;
+	COLOR RGB(0,0,0,,,,)
+@ 11.154,17.200 GET m.nombre ;
+	SIZE 1.000,35.400 ;
+	DEFAULT " " ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@K!" ;
+	DISABLE
+@ 12.000,67.200 GET m.ACEPTAR ;
+	PICTURE "@*VN ACEPTAR;CANCELAR" ;
+	SIZE 2.077,12.000,0.308 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "B" ;
+	VALID _s870vc7w5() ;
+	DISABLE
+@ 18.462,7.200 GET m.movimiento ;
+	PICTURE "@*BHN " + ;
+		(LOCFILE("..\wizards\wizbmps\wztop.bmp","BMP|ICO|PCT|ICN","¿Dónde está wztop?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzback.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzback?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzlocate.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzlocate?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wznext.bmp","BMP|ICO|PCT|ICN","¿Dónde está wznext?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzend.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzend?")) ;
+	SIZE 2.000,9.400,0.800 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	VALID _s870vc7xz()
+@ 3.692,67.200 GET m.ACCION ;
+	PICTURE "@*BVN " + ;
+		(LOCFILE("..\wizards\wizbmps\wznew.bmp","BMP|ICO|PCT|ICN","¿Dónde está wznew?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzdelete.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzdelete?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzedit.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzedit?")) ;
+	SIZE 2.077,14.800,0.308 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	VALID _s870vc7yr()
+@ 17.538,67.200 GET m.salir ;
+	PICTURE "@*BHT " + ;
+		(LOCFILE("..\wizards\wizbmps\wzclose.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzclose?")) ;
+	SIZE 3.769,14.600,0.800 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8
+
+IF NOT WVISIBLE("bancos")
+	ACTIVATE WINDOW bancos
+ENDIF
+
+READ CYCLE MODAL
+
+RELEASE WINDOW bancos
+
+*       *********************************************************
+*       *                                                         
+*       *             Windows Cerrando bases de datos             
+*       *                                                         
+*       *********************************************************
+*
+
+IF USED("banco")
+	SELECT banco
+	USE
+ENDIF
+
+SELECT (m.currarea)
+
+
+#REGION 0
+
+SET READBORDER &rborder
+
+IF m.talkstat = "ON"
+	SET TALK ON
+ENDIF
+IF m.compstat = "ON"
+	SET COMPATIBLE ON
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC7W5           m.ACEPTAR VALID                    
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         BANCOS,     Record Number:    6    
+*       * Variable:            m.ACEPTAR                          
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      1                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc7w5     &&  m.ACEPTAR VALID
+#REGION 1
+IF M.ACEPTAR = 1
+	DO CASE
+	CASE M.ACCION = 1
+		IF M.nombre = "  "
+			WAIT WINDOW NOWAIT "ESCRIBA EL NOMBRE DEL BANCO"
+			return
+		else
+			LOCATE FOR NOMBRE = M.NOMBRE
+			IF FOUND()
+				WAIT WINDOW NOWAIT "YA EXISTE UN BANCO CON ESTE NOMBRE"
+				RETURN
+			ENDIF
+		ENDIF
+		m.codigo = reccount() + 1
+		INSERT INTO BANCO FROM MEMVAR
+		SHOW GETS DISABLE
+		SHOW GET M.ACCION ENABLE
+		SHOW GET M.MOVIMIENTO ENABLE
+		SHOW GET M.ACEPTAR DISABLE
+		SHOW GET M.SALIR ENABLE
+
+	CASE M.ACCION = 3
+		IF M.nombre = "  "
+			WAIT WINDOW NOWAIT "ESCRIBA EL NOMBRE DEL BANCO"
+			return
+		else
+			LOCATE FOR NOMBRE = M.NOMBRE
+			IF FOUND() .AND. nreg <> recno()
+				WAIT WINDOW NOWAIT "YA EXISTE UN BANCO CON ESTE NOMBRE"
+				RETURN
+			ENDIF
+		ENDIF
+
+		goto nreg
+		m.codigo = recno()
+		GATHER MEMVAR
+		SHOW GETS DISABLE
+		SHOW GET M.ACCION ENABLE
+		SHOW GET M.MOVIMIENTO ENABLE
+		SHOW GET M.ACEPTAR DISABLE
+		SHOW GET M.SALIR ENABLE
+	ENDCASE
+ELSE
+	SHOW GETS DISABLE
+	SHOW GET M.ACCION ENABLE
+	SHOW GET M.MOVIMIENTO ENABLE
+	SHOW GET M.ACEPTAR DISABLE
+	SHOW GET M.SALIR ENABLE
+ENDIF
+SHOW GETS
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC7XZ           m.movimiento VALID                 
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         BANCOS,     Record Number:    7    
+*       * Variable:            m.movimiento                       
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      2                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc7xz     &&  m.movimiento VALID
+#REGION 1
+DO P_MUEVE
+show gets
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC7YR           m.ACCION VALID                     
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         BANCOS,     Record Number:    8    
+*       * Variable:            m.ACCION                           
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      3                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc7yr     &&  m.ACCION VALID
+#REGION 1
+DO CASE
+CASE M.ACCION = 1
+	SCATTER MEMVAR BLANK
+	SHOW GETS DISABLE
+	SHOW GET M.NOMBRE ENABLE
+	show get m.aceptar enable
+CASE M.ACCION = 2
+	DO BORRAR.SPR
+CASE M.ACCION = 3
+	SHOW GETS DISABLE
+	SHOW GET M.NOMBRE enable
+	show get m.aceptar enable
+	nReg = recno()
+	SCATTER MEMVAR
+ENDCASE
+SHOW GETS

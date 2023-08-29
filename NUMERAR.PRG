@@ -1,0 +1,82 @@
+select 10
+USE NUMEROS
+STRTOTAL = TRANSFORM(TOTAL, "9999.99")
+store " " to l_mil, l_centena, l_decena, l_unidad, l_numero, l_decimal
+uni_mil = left(strtotal, 1)
+do case
+	case val(uni_mil) = 0
+		l_mil = ""
+	case val(uni_mil) = 1
+		l_mil = "MIL"
+	otherwise
+		goto val(uni_mil)
+		l_mil = alltrim(unidad) + " MIL"
+endcase 
+
+uni_cien = substr(strtotal, 2,1)
+uni_dece = substr(strtotal, 3,1)
+uni_uni = substr(strtotal, 4, 1)
+uni_deci = substr(strtotal,6,2)
+
+do case
+case val(uni_cien) = 0
+	l_centena = ""
+case val(uni_cien) = 1 .and. (val(uni_dece)<> 0 .or. val(uni_uni) <> 0)
+		l_centena = " CIENTO"
+otherwise
+	goto val(uni_cien)
+	l_centena = " " + alltrim(centena) 
+endcase
+
+do case
+case val(uni_dece) = 0
+	l_decena = ""
+case val(uni_dece) = 1 .and. val(uni_uni) <6 .and. val(uni_uni) > 0
+	do case
+	case val(uni_uni) = 1
+		l_decena = " ONCE "
+	case val(uni_uni) = 2
+		l_decena = " DOCE "
+	case val(uni_uni) = 3
+		l_decena = " TRECE "
+	case val(uni_uni) = 4
+		l_decena = " CATORCE "
+	case val(uni_uni) = 5
+		l_decena = " QUINCE "
+	endcase
+case val(uni_dece) = 1 .and. val(uni_uni) > 5
+	l_decena = " DIECI"
+case val(uni_dece) = 2 .and. val(uni_uni) > 0
+	l_decena = " VEINTI"
+otherwise
+	goto val(uni_dece)
+	l_decena = " " + alltrim(decena)
+endcase
+
+do case
+case val(uni_dece) = 1 .and. val(uni_uni) > 0 .and. val(uni_uni) < 6
+	l_unidad = ""
+case val(uni_uni) = 0
+	l_unidad = ""
+otherwise
+	goto val(uni_uni)
+	if val(uni_dece) < 3 
+		l_unidad = alltrim(unidad)
+	else
+		l_unidad = " Y " + alltrim(unidad)
+	endif
+endcase
+		
+if val(uni_deci) > 0
+	l_decimal = " CON " + uni_deci + "/100"
+else
+	l_decimal = ""
+endif
+
+if val(left(strtotal,4)) = 0
+	l_numero = "CERO" + l_decimal
+else
+	l_numero = l_mil + l_centena + l_decena + l_unidad + l_decimal + "."
+endif
+use
+

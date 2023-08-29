@@ -1,0 +1,15 @@
+numline = IIF(EOF(), -1,recno())
+set filter to
+sum haberes for tipo = 1 to m.tothaberes
+sum descuento for tipo = 2 to m.totdescuen
+sum haberes for tipo = 3 to m.totadicion
+sum haberes for tipo = 4 to m.totanticip
+m.total = m.tothaberes - m.totdescuen + m.totadicion ;
+	+ m.totanticip
+
+set filter to tipo = m.gato
+IF NUMLINE > -1
+	goto numline
+ELSE
+	GO TOP
+ENDIF

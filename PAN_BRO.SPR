@@ -1,0 +1,91 @@
+*       *********************************************************
+*       *                                                         
+*       * 30/09/98             PAN_BRO.SPR               17:37:12 
+*       *                                                         
+*       *********************************************************
+*       *                                                         
+*       * Nombre del autor                                        
+*       *                                                         
+*       * Copyright (c) 1998 Nombre de la empresa                 
+*       * Dirección                                               
+*       * Ciudad,     C.P.                                        
+*       * País                                              
+*       *                                                         
+*       * Description:                                            
+*       * Este programa lo ha generado automáticamente GENSCRN.    
+*       *                                                         
+*       *********************************************************
+
+
+#REGION 0
+REGIONAL m.currarea, m.talkstat, m.compstat
+
+IF SET("TALK") = "ON"
+	SET TALK OFF
+	m.talkstat = "ON"
+ELSE
+	m.talkstat = "OFF"
+ENDIF
+m.compstat = SET("COMPATIBLE")
+SET COMPATIBLE FOXPLUS
+
+m.rborder = SET("READBORDER")
+SET READBORDER ON
+
+*       *********************************************************
+*       *                                                         
+*       *             Windows Definiciones de ventana             
+*       *                                                         
+*       *********************************************************
+*
+
+IF NOT WEXIST("pan_bro") ;
+	OR UPPER(WTITLE("PAN_BRO")) == "PAN_BRO.PJX" ;
+	OR UPPER(WTITLE("PAN_BRO")) == "PAN_BRO.SCX" ;
+	OR UPPER(WTITLE("PAN_BRO")) == "PAN_BRO.MNX" ;
+	OR UPPER(WTITLE("PAN_BRO")) == "PAN_BRO.PRG" ;
+	OR UPPER(WTITLE("PAN_BRO")) == "PAN_BRO.FRX" ;
+	OR UPPER(WTITLE("PAN_BRO")) == "PAN_BRO.QPR"
+	DEFINE WINDOW pan_bro ;
+		AT 6.500, 20.714 ;
+		SIZE 12.813,70.286 ;
+		FONT "MS Sans Serif", 8 ;
+		FLOAT ;
+		NOCLOSE ;
+		MINIMIZE ;
+		SYSTEM
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       *        PAN_BRO/Windows Distribución de pantalla         
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+IF WVISIBLE("pan_bro")
+	ACTIVATE WINDOW pan_bro SAME
+ELSE
+	ACTIVATE WINDOW pan_bro NOSHOW
+ENDIF
+
+IF NOT WVISIBLE("pan_bro")
+	ACTIVATE WINDOW pan_bro
+ENDIF
+
+READ CYCLE
+
+RELEASE WINDOW pan_bro
+
+#REGION 0
+
+SET READBORDER &rborder
+
+IF m.talkstat = "ON"
+	SET TALK ON
+ENDIF
+IF m.compstat = "ON"
+	SET COMPATIBLE ON
+ENDIF

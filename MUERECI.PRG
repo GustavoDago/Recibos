@@ -1,0 +1,33 @@
+
+select line
+set filter to
+SET SAFETY OFF
+zap
+SET SAFETY ON
+
+select concepto
+set filter to
+go top
+
+SELECT LINEA
+SET RELATION TO Linea.cod_concep INTO Concepto
+SET FILTER TO LINEA.COD_RECIBO = RECIBOS.COD_RECIBO
+go top
+SCAN
+	INSERT INTO LINE (Codigo, Unidades, Descripcio, Haberes, Descuento, Tipo);
+	 VALUES (linea.cod_concep, linea.unidades, concepto.descripcio, linea.haberes,;
+	  linea.descuentos, concepto.tipo)
+ENDSCAN
+set relation to
+
+select line
+set filter to tipo = m.gato
+GO TOP
+SCATTER MEMVAR
+M. v = TRANSFORM(Line.Codigo, "9999") + " " + TRANSFORM( Line.Unidades,"9999.99");
+ + " " + TRANSFORM(Line.Descripcio, "XXXXXXXXXXXXXXXXXXXX") + "  " + ;
+ TRANSFORM( Line.Haberes,"9999.99") + " " + TRANSFORM( Line.Descuento,"9999.99")
+
+SELECT RECIBOS
+
+SHOW GETS

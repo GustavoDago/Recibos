@@ -1,0 +1,416 @@
+*       *********************************************************
+*       *                                                         
+*       * 07/09/99            ANTICIPO.SPR               14:37:15 
+*       *                                                         
+*       *********************************************************
+*       *                                                         
+*       * Gustavo Dagoberto                                       
+*       *                                                         
+*       * Copyright (c) 1999 Gusmafer                             
+*       * Dirección                                               
+*       * Ciudad,     C.P.                                        
+*       * País                                              
+*       *                                                         
+*       * Description:                                            
+*       * Este programa lo ha generado automáticamente GENSCRN.    
+*       *                                                         
+*       *********************************************************
+
+
+#REGION 0
+REGIONAL m.currarea, m.talkstat, m.compstat
+
+IF SET("TALK") = "ON"
+	SET TALK OFF
+	m.talkstat = "ON"
+ELSE
+	m.talkstat = "OFF"
+ENDIF
+m.compstat = SET("COMPATIBLE")
+SET COMPATIBLE FOXPLUS
+
+m.rborder = SET("READBORDER")
+SET READBORDER ON
+
+m.currarea = SELECT()
+
+
+*       *********************************************************
+*       *                                                         
+*       *  ANTICIPO/Windows Bases de datos, índices, relaciones   
+*       *                                                         
+*       *********************************************************
+*
+
+IF USED("anticipo")
+	SELECT anticipo
+	SET ORDER TO TAG "fecha"
+ELSE
+	SELECT 0
+	USE (LOCFILE("anticipo.dbf","DBF","Buscar  anticipo?"));
+		AGAIN ALIAS anticipo ;
+		ORDER TAG "fecha"
+ENDIF
+
+IF USED("empleado")
+	SELECT empleado
+	SET ORDER TO 0
+ELSE
+	SELECT 0
+	USE (LOCFILE("empleado.dbf","DBF","Buscar  empleado?"));
+		AGAIN ALIAS empleado ;
+		ORDER 0
+ENDIF
+
+SELECT anticipo
+
+
+*       *********************************************************
+*       *                                                         
+*       *             Windows Definiciones de ventana             
+*       *                                                         
+*       *********************************************************
+*
+
+IF NOT WEXIST("anticipos") ;
+	OR UPPER(WTITLE("ANTICIPOS")) == "ANTICIPOS.PJX" ;
+	OR UPPER(WTITLE("ANTICIPOS")) == "ANTICIPOS.SCX" ;
+	OR UPPER(WTITLE("ANTICIPOS")) == "ANTICIPOS.MNX" ;
+	OR UPPER(WTITLE("ANTICIPOS")) == "ANTICIPOS.PRG" ;
+	OR UPPER(WTITLE("ANTICIPOS")) == "ANTICIPOS.FRX" ;
+	OR UPPER(WTITLE("ANTICIPOS")) == "ANTICIPOS.QPR"
+	DEFINE WINDOW anticipos ;
+		AT 1.231, 8.400 ;
+		SIZE 28.538,78.400 ;
+		TITLE "Visor de anticipos" ;
+		FONT "MS Sans Serif", 8 ;
+		FLOAT ;
+		CLOSE ;
+		NOMINIMIZE ;
+		SYSTEM ;
+		COLOR RGB(,,,192,192,192)
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       *  ANTICIPO/Windows Código de configuración - SECCION 2   
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+SCATTER MEMVAR
+
+
+#REGION 1
+DEFINE POPUP _s870vc61d ;
+	PROMPT FIELD Empleado.nombre ;
+	SCROLL
+
+*       *********************************************************
+*       *                                                         
+*       *        ANTICIPO/Windows Distribución de pantalla        
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+IF WVISIBLE("anticipos")
+	ACTIVATE WINDOW anticipos SAME
+ELSE
+	ACTIVATE WINDOW anticipos NOSHOW
+ENDIF
+@ 1.846,25.800 SAY "Anticipos" ;
+	PICTURE "@I" ;
+	FONT "GeoSlab703 MdCn BT", 24 ;
+	STYLE "B" ;
+	COLOR RGB(128,0,0,192,192,192)
+@ 10.231,4.800 SAY "Fecha" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,0,,,,)
+@ 13.923,4.800 SAY "Debe" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,0,,,,)
+@ 8.385,4.800 SAY "Codigo Empleado" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,0,,,,)
+@ 12.077,4.800 SAY "Código recibo" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T"
+@ 15.769,4.800 SAY "Haber" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T"
+@ 1.462,75.000 TO 27.077,75.000 ;
+	PEN 2, 8 ;
+	COLOR RGB(128,128,128,128,128,128)
+@ 0.385,77.400 TO 28.308,77.400 ;
+	PEN 2, 8 ;
+	COLOR RGB(128,128,128,128,128,128)
+@ 0.231,0.800 TO 28.154,0.800 ;
+	PEN 2, 8 ;
+	COLOR RGB(255,255,255,255,255,255)
+@ 1.385,75.200 TO 27.308,75.200 ;
+	PEN 2, 8 ;
+	COLOR RGB(255,255,255,255,255,255)
+@ 27.077,3.600 TO 27.077,75.200 ;
+	PEN 2, 8 ;
+	STYLE "1" ;
+	COLOR RGB(128,128,128,128,128,128)
+@ 28.154,0.400 TO 28.154,77.600 ;
+	PEN 2, 8 ;
+	STYLE "1" ;
+	COLOR RGB(128,128,128,128,128,128)
+@ 0.154,1.000 TO 0.154,77.400 ;
+	PEN 2, 8 ;
+	STYLE "1" ;
+	COLOR RGB(128,128,128,128,128,128)
+@ 0.231,1.000 TO 0.231,77.600 ;
+	PEN 2, 8 ;
+	STYLE "1" ;
+	COLOR RGB(255,255,255,255,255,255)
+@ 27.154,3.600 TO 27.154,75.200 ;
+	PEN 2, 8 ;
+	STYLE "1" ;
+	COLOR RGB(255,255,255,255,255,255)
+@ 1.462,3.400 TO 27.231,3.400 ;
+	PEN 2, 8 ;
+	COLOR RGB(128,128,128,128,128,128)
+@ 1.308,3.600 TO 1.308,75.000 ;
+	PEN 2, 8 ;
+	STYLE "1" ;
+	COLOR RGB(128,128,128,128,128,128)
+@ 0.231,0.400 TO 28.154,0.400 ;
+	PEN 2, 8 ;
+	COLOR RGB(128,128,128,128,128,128)
+@ 17.615,4.800 SAY "Pago" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T"
+@ 19.462,4.800 SAY "Estado" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T"
+@ 8.385,24.400 SAY Anticipo.cod_empado ;
+	SIZE 1.000,6.400 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@L" ;
+	COLOR RGB(128,128,128,255,255,255)
+@ 10.231,24.400 SAY Anticipo.fecha ;
+	SIZE 1.000,13.600 ;
+	FONT "MS Sans Serif", 8
+@ 12.077,24.400 SAY Anticipo.cod_recibo ;
+	SIZE 1.000,11.200 ;
+	FONT "MS Sans Serif", 8
+@ 13.923,24.400 SAY Anticipo.debe ;
+	SIZE 1.000,16.000 ;
+	FONT "MS Sans Serif", 8
+@ 15.769,24.400 SAY Anticipo.haber ;
+	SIZE 1.000,16.000 ;
+	FONT "MS Sans Serif", 8
+@ 17.615,24.400 SAY Anticipo.pago ;
+	SIZE 1.000,13.600 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "9999"
+@ 19.462,24.400 SAY Anticipo.estado ;
+	SIZE 1.000,8.800 ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(128,128,128,255,255,255)
+@ 8.385,48.000 GET m.filtra ;
+	PICTURE "@*C Por empleado" ;
+	SIZE 1.308,17.333 ;
+	DEFAULT 0 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "BT" ;
+	VALID _s870vc64e()
+@ 11.154,48.200 GET m.lista ;
+ 	PICTURE "@&N" ;
+	POPUP _s870vc61d ;
+	SIZE 8.077,23.800 ;
+	DEFAULT " " ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "" ;
+	WHEN _s870vc64z() ;
+	DISABLE
+@ 24.000,7.200 GET m.movimiento ;
+	PICTURE "@*BHN " + ;
+		(LOCFILE("..\wizards\wizbmps\wztop.bmp","BMP|ICO|PCT|ICN","¿Dónde está wztop?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzback.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzback?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzlocate.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzlocate?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wznext.bmp","BMP|ICO|PCT|ICN","¿Dónde está wznext?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzend.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzend?")) ;
+	SIZE 2.000,9.400,0.800 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	VALID _s870vc65t()
+@ 22.154,60.000 GET m.salir ;
+	PICTURE "@*BHT " + ;
+		(LOCFILE("..\wizards\wizbmps\wzclose.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzclose?")) ;
+	SIZE 3.769,14.600,0.800 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8
+@ 19.462,48.400 SAY Empleado.dni ;
+	SIZE 1.000,10.200 ;
+	FONT "MS Sans Serif", 8
+
+IF NOT WVISIBLE("anticipos")
+	ACTIVATE WINDOW anticipos
+ENDIF
+
+READ CYCLE MODAL ;
+	SHOW _s870vc66o()
+
+RELEASE WINDOW anticipos
+
+*       *********************************************************
+*       *                                                         
+*       *             Windows Cerrando bases de datos             
+*       *                                                         
+*       *********************************************************
+*
+
+IF USED("anticipo")
+	SELECT anticipo
+	USE
+ENDIF
+
+IF USED("empleado")
+	SELECT empleado
+	USE
+ENDIF
+
+SELECT (m.currarea)
+
+RELEASE POPUPS _s870vc61d
+
+#REGION 0
+
+SET READBORDER &rborder
+
+IF m.talkstat = "ON"
+	SET TALK ON
+ENDIF
+IF m.compstat = "ON"
+	SET COMPATIBLE ON
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC64E           m.filtra VALID                     
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         ANTICIPO,     Record Number:   31  
+*       * Variable:            m.filtra                           
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Check Box                          
+*       * Snippet Number:      1                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc64e     &&  m.filtra VALID
+#REGION 1
+if m.filtra = .t.
+	show get m.lista enable
+else
+	set filter to
+	show get m.lista disable
+endif
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC64Z           m.lista WHEN                       
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         ANTICIPO,     Record Number:   32  
+*       * Variable:            m.lista                            
+*       * Called By:           WHEN Clause                        
+*       * Object Type:         List                               
+*       * Snippet Number:      2                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc64z     &&  m.lista WHEN
+#REGION 1
+set filter to cod_empado = empleado.codigo
+show gets
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC65T           m.movimiento VALID                 
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         ANTICIPO,     Record Number:   33  
+*       * Variable:            m.movimiento                       
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      3                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc65t     &&  m.movimiento VALID
+#REGION 1
+DO P_MUEVE
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC66O           Nivel de lectura SHOW              
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         ANTICIPO                           
+*       * Called By:           READ Statement                     
+*       * Snippet Number:      4                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc66o     && Read Level Show
+PRIVATE currwind
+STORE WOUTPUT() TO currwind
+*
+* Código SHOW de la pantalla: ANTICIPO
+*
+#REGION 1
+IF SYS(2016) = "ANTICIPOS" OR SYS(2016) = "*"
+	ACTIVATE WINDOW anticipos SAME
+	@ 8.385,24.400 SAY Anticipo.cod_empado ;
+		SIZE 1.000,6.400, 0.000 ;
+		FONT "MS Sans Serif", 8 ;
+		PICTURE "@L" ;
+		COLOR RGB(128,128,128,255,255,255)
+	@ 10.231,24.400 SAY Anticipo.fecha ;
+		SIZE 1.000,13.600, 0.000 ;
+		FONT "MS Sans Serif", 8
+	@ 12.077,24.400 SAY Anticipo.cod_recibo ;
+		SIZE 1.000,11.200, 0.000 ;
+		FONT "MS Sans Serif", 8
+	@ 13.923,24.400 SAY Anticipo.debe ;
+		SIZE 1.000,16.000, 0.000 ;
+		FONT "MS Sans Serif", 8
+	@ 15.769,24.400 SAY Anticipo.haber ;
+		SIZE 1.000,16.000, 0.000 ;
+		FONT "MS Sans Serif", 8
+	@ 17.615,24.400 SAY Anticipo.pago ;
+		SIZE 1.000,13.600, 0.000 ;
+		FONT "MS Sans Serif", 8 ;
+		PICTURE "9999"
+	@ 19.462,24.400 SAY Anticipo.estado ;
+		SIZE 1.000,8.800, 0.000 ;
+		FONT "MS Sans Serif", 8 ;
+		COLOR RGB(128,128,128,255,255,255)
+	@ 19.462,48.400 SAY Empleado.dni ;
+		SIZE 1.000,10.200, 0.000 ;
+		FONT "MS Sans Serif", 8
+ENDIF
+IF NOT EMPTY(currwind)
+	ACTIVATE WINDOW (currwind) SAME
+ENDIF

@@ -1,0 +1,296 @@
+*       *********************************************************
+*       *                                                         
+*       * 07/09/99            RELAEMPL.SPR               14:37:19 
+*       *                                                         
+*       *********************************************************
+*       *                                                         
+*       * Gustavo Dagoberto                                       
+*       *                                                         
+*       * Copyright (c) 1999 Gusmafer                             
+*       * Dirección                                               
+*       * Ciudad,     C.P.                                        
+*       * País                                              
+*       *                                                         
+*       * Description:                                            
+*       * Este programa lo ha generado automáticamente GENSCRN.    
+*       *                                                         
+*       *********************************************************
+
+
+#REGION 0
+REGIONAL m.currarea, m.talkstat, m.compstat
+
+IF SET("TALK") = "ON"
+	SET TALK OFF
+	m.talkstat = "ON"
+ELSE
+	m.talkstat = "OFF"
+ENDIF
+m.compstat = SET("COMPATIBLE")
+SET COMPATIBLE FOXPLUS
+
+m.rborder = SET("READBORDER")
+SET READBORDER ON
+
+*       *********************************************************
+*       *                                                         
+*       *  RELAEMPL/Windows Bases de datos, índices, relaciones   
+*       *                                                         
+*       *********************************************************
+*
+
+IF USED("empledor")
+	SELECT empledor
+	SET ORDER TO TAG "nombre"
+ELSE
+	SELECT 0
+	USE (LOCFILE("empledor.dbf","DBF","Buscar  empledor?"));
+		AGAIN ALIAS empledor ;
+		ORDER TAG "nombre"
+ENDIF
+
+IF USED("empleado")
+	SELECT empleado
+	SET ORDER TO TAG "nombre"
+ELSE
+	SELECT 0
+	USE (LOCFILE("empleado.dbf","DBF","Buscar  empleado?"));
+		AGAIN ALIAS empleado ;
+		ORDER TAG "nombre"
+ENDIF
+
+SELECT empledor
+
+
+*       *********************************************************
+*       *                                                         
+*       *             Windows Definiciones de ventana             
+*       *                                                         
+*       *********************************************************
+*
+
+IF NOT WEXIST("seleccion") ;
+	OR UPPER(WTITLE("SELECCION")) == "SELECCION.PJX" ;
+	OR UPPER(WTITLE("SELECCION")) == "SELECCION.SCX" ;
+	OR UPPER(WTITLE("SELECCION")) == "SELECCION.MNX" ;
+	OR UPPER(WTITLE("SELECCION")) == "SELECCION.PRG" ;
+	OR UPPER(WTITLE("SELECCION")) == "SELECCION.FRX" ;
+	OR UPPER(WTITLE("SELECCION")) == "SELECCION.QPR"
+	DEFINE WINDOW seleccion ;
+		AT 3.000, 8.400 ;
+		SIZE 18.692,75.000 ;
+		TITLE "SELECCIONE AL EMPLEADO " ;
+		FONT "MS Sans Serif", 8 ;
+		FLOAT ;
+		CLOSE ;
+		NOMINIMIZE ;
+		DOUBLE ;
+		COLOR RGB(,,,0,128,128)
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       *  RELAEMPL/Windows Código de configuración - SECCION 2   
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+SELECT EMPLEDOR
+GO TOP
+M.ABO = Empledor.nombre
+SELECT EMPLEADO
+SET FILTER TO COD_EMPDOR = EMPLEDOR.CODIGO
+GO TOP
+M.CLIE = Empleado.nombre
+
+#REGION 1
+DEFINE POPUP _s870vc8mp ;
+	PROMPT FIELD Empledor.nombre ;
+	SCROLL
+DEFINE POPUP _s870vc8mq ;
+	PROMPT FIELD Empleado.nombre ;
+	SCROLL
+
+*       *********************************************************
+*       *                                                         
+*       *        RELAEMPL/Windows Distribución de pantalla        
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+IF WVISIBLE("seleccion")
+	ACTIVATE WINDOW seleccion SAME
+ELSE
+	ACTIVATE WINDOW seleccion NOSHOW
+ENDIF
+@ 0.000,0.000 TO 1.923,74.600 ;
+	PATTERN 1 ;
+	PEN 1, 0 ;
+	COLOR RGB(,,,0,128,0)
+@ 15.692,0.200 TO 18.538,36.200 ;
+	PATTERN 1 ;
+	PEN 1, 8 ;
+	STYLE "T"
+@ 11.077,38.400 TO 13.923,74.600 ;
+	PATTERN 1 ;
+	PEN 1, 8 ;
+	STYLE "T"
+@ 15.692,38.400 GET M.RELAC ;
+	PICTURE "@*VT CONTINUAR" ;
+	SIZE 2.846,14.167,0.308 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "B"
+@ 15.692,57.600 GET m.nocontinua ;
+	PICTURE "@*HT CANCELAR" ;
+	SIZE 2.846,14.167,0.667 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "B"
+@ 1.923,0.200 GET M.ABO ;
+ 	PICTURE "@&N" ;
+	POPUP _s870vc8mp ;
+	SIZE 13.846,35.800 ;
+	DEFAULT " " ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "" ;
+	WHEN _s870vc8np()
+@ 1.923,38.600 GET M.CLIE ;
+ 	PICTURE "@&N" ;
+	POPUP _s870vc8mq ;
+	SIZE 9.231,35.800 ;
+	DEFAULT " " ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "" ;
+	WHEN _s870vc8oa()
+@ 16.692,14.800 SAY Empledor.cuit ;
+	SIZE 1.000,17.000 ;
+	FONT "MS Sans Serif", 8
+@ 12.077,55.600 SAY Empleado.dni ;
+	SIZE 1.000,17.200 ;
+	FONT "MS Sans Serif", 8
+@ 16.692,4.400 SAY "CUIT" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T"
+@ 12.077,45.200 SAY "DNI" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T"
+@ 0.000,36.000 TO 18.538,38.600 ;
+	PATTERN 7 ;
+	PEN 1, 0 ;
+	COLOR RGB(,,,0,0,0)
+@ 13.846,38.400 TO 14.846,74.600 ;
+	PATTERN 7 ;
+	PEN 1, 0 ;
+	COLOR RGB(,,,0,0,0)
+@ 0.077,7.200 SAY "EMPLEADOR" ;
+	FONT "Courier New", 10 ;
+	STYLE "BT" ;
+	COLOR RGB(255,255,255,,,,)
+@ 0.077,50.400 SAY "EMPLEADO" ;
+	FONT "Courier New", 10 ;
+	STYLE "BT" ;
+	COLOR RGB(255,255,255,,,,)
+
+IF NOT WVISIBLE("seleccion")
+	ACTIVATE WINDOW seleccion
+ENDIF
+
+READ CYCLE MODAL ;
+	SHOW _s870vc8pl()
+
+RELEASE WINDOW seleccion
+RELEASE POPUPS _s870vc8mp, _s870vc8mq
+
+#REGION 0
+
+SET READBORDER &rborder
+
+IF m.talkstat = "ON"
+	SET TALK ON
+ENDIF
+IF m.compstat = "ON"
+	SET COMPATIBLE ON
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC8NP           M.ABO WHEN                         
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         RELAEMPL,     Record Number:    9  
+*       * Variable:            M.ABO                              
+*       * Called By:           WHEN Clause                        
+*       * Object Type:         List                               
+*       * Snippet Number:      1                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc8np     &&  M.ABO WHEN
+#REGION 1
+select empleado
+set filter to cod_empdor = empledor.codigo
+GO TOP
+M.CLIE = Empleado.nombre
+select empledor
+SHOW GETS
+
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC8OA           M.CLIE WHEN                        
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         RELAEMPL,     Record Number:   10  
+*       * Variable:            M.CLIE                             
+*       * Called By:           WHEN Clause                        
+*       * Object Type:         List                               
+*       * Snippet Number:      2                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc8oa     &&  M.CLIE WHEN
+#REGION 1
+SHOW GETS
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC8PL           Nivel de lectura SHOW              
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         RELAEMPL                           
+*       * Called By:           READ Statement                     
+*       * Snippet Number:      3                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc8pl     && Read Level Show
+PRIVATE currwind
+STORE WOUTPUT() TO currwind
+*
+* Código SHOW de la pantalla: RELAEMPL
+*
+#REGION 1
+IF SYS(2016) = "SELECCION" OR SYS(2016) = "*"
+	ACTIVATE WINDOW seleccion SAME
+	@ 16.692,14.800 SAY Empledor.cuit ;
+		SIZE 1.000,17.000, 0.000 ;
+		FONT "MS Sans Serif", 8
+	@ 12.077,55.600 SAY Empleado.dni ;
+		SIZE 1.000,17.200, 0.000 ;
+		FONT "MS Sans Serif", 8
+ENDIF
+IF NOT EMPTY(currwind)
+	ACTIVATE WINDOW (currwind) SAME
+ENDIF

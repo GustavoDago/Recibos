@@ -1,0 +1,1089 @@
+*       *********************************************************
+*       *                                                         
+*       * 07/09/99             SUELDO.SPR                14:37:16 
+*       *                                                         
+*       *********************************************************
+*       *                                                         
+*       * Gustavo Dagoberto                                       
+*       *                                                         
+*       * Copyright (c) 1999 Gusmafer                             
+*       * Dirección                                               
+*       * Ciudad,     C.P.                                        
+*       * País                                              
+*       *                                                         
+*       * Description:                                            
+*       * Este programa lo ha generado automáticamente GENSCRN.    
+*       *                                                         
+*       *********************************************************
+
+
+#REGION 0
+REGIONAL m.currarea, m.talkstat, m.compstat
+
+IF SET("TALK") = "ON"
+	SET TALK OFF
+	m.talkstat = "ON"
+ELSE
+	m.talkstat = "OFF"
+ENDIF
+m.compstat = SET("COMPATIBLE")
+SET COMPATIBLE FOXPLUS
+
+m.rborder = SET("READBORDER")
+SET READBORDER ON
+
+m.currarea = SELECT()
+
+
+*       *********************************************************
+*       *                                                         
+*       *   SUELDO/Windows Bases de datos, índices, relaciones    
+*       *                                                         
+*       *********************************************************
+*
+
+IF USED("recibos")
+	SELECT recibos
+	SET ORDER TO TAG "cod_empado"
+ELSE
+	SELECT 0
+	USE (LOCFILE("recibos.dbf","DBF","Buscar  recibos?"));
+		AGAIN ALIAS recibos ;
+		ORDER TAG "cod_empado"
+ENDIF
+
+IF USED("concepto")
+	SELECT concepto
+	SET ORDER TO TAG "codigo"
+ELSE
+	SELECT 0
+	USE (LOCFILE("concepto.dbf","DBF","Buscar  concepto?"));
+		AGAIN ALIAS concepto ;
+		ORDER TAG "codigo"
+ENDIF
+
+IF USED("linea")
+	SELECT linea
+	SET ORDER TO TAG "cod_recibo"
+ELSE
+	SELECT 0
+	USE (LOCFILE("linea.dbf","DBF","Buscar  linea?"));
+		AGAIN ALIAS linea ;
+		ORDER TAG "cod_recibo"
+ENDIF
+
+IF USED("banco")
+	SELECT banco
+	SET ORDER TO 0
+ELSE
+	SELECT 0
+	USE (LOCFILE("banco.dbf","DBF","Buscar  banco?"));
+		AGAIN ALIAS banco ;
+		ORDER 0
+ENDIF
+
+IF USED("localida")
+	SELECT localida
+	SET ORDER TO 0
+ELSE
+	SELECT 0
+	USE (LOCFILE("localida.dbf","DBF","Buscar  localida?"));
+		AGAIN ALIAS localida ;
+		ORDER 0
+ENDIF
+
+SELECT recibos
+
+
+*       *********************************************************
+*       *                                                         
+*       *             Windows Definiciones de ventana             
+*       *                                                         
+*       *********************************************************
+*
+
+IF NOT WEXIST("sueldos") ;
+	OR UPPER(WTITLE("SUELDOS")) == "SUELDOS.PJX" ;
+	OR UPPER(WTITLE("SUELDOS")) == "SUELDOS.SCX" ;
+	OR UPPER(WTITLE("SUELDOS")) == "SUELDOS.MNX" ;
+	OR UPPER(WTITLE("SUELDOS")) == "SUELDOS.PRG" ;
+	OR UPPER(WTITLE("SUELDOS")) == "SUELDOS.FRX" ;
+	OR UPPER(WTITLE("SUELDOS")) == "SUELDOS.QPR"
+	DEFINE WINDOW sueldos ;
+		AT 2.000, 2.000 ;
+		SIZE 22.846,115.800 ;
+		TITLE "CONFECCION DE RECIBOS DE SUELDOS DE &TITEMPLE" ;
+		FONT "MS Sans Serif", 8 ;
+		FLOAT ;
+		CLOSE ;
+		NOMINIMIZE ;
+		SYSTEM ;
+		FILL FILE LOCFILE("RAYADO.BMP","BMP|ICO|PCT|ICN", ;
+			"¿Dónde está rayado?")
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       *   SUELDO/Windows Código de configuración - SECCION 2    
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+
+CREATE CURSOR LINE (codigo N(4), UNIDADES N(7,2), DESCRIPCION C(30), HABERES N(7,2), DESCUENTO N(7,2), TIPO N(1))
+set filter to  tipo = 1
+
+store 0 to m.ahaberes, adescuento, m.acodigo, m.tothaberes, m.totdescuen, m.total,;
+	 m.totanticip, m.totadicion
+l_numero = " "
+m.opciones = 2
+M.alta = .f.
+M.ENCONTRO = .F.
+M.gato = 1
+SELECT LINE
+m.banco = 1
+
+select banco
+copy to array matriz_bancos fields nombre,codigo
+
+SELECT RECIBOS
+COUNT FOR RECIBOS.COD_EMPADO = EMPLEADO.CODIGO TO BAR
+SET FILTER TO RECIBOS.COD_EMPADO = EMPLEADO.CODIGO
+GO TOP
+
+SCATTER MEMVAR
+
+SELECT LINEA
+SET RELATION TO Linea.cod_concep INTO Concepto
+SET FILTER TO LINEA.COD_RECIBO = RECIBOS.COD_RECIBO
+SCAN
+	INSERT INTO LINE (Codigo, Unidades, Descripcio, Haberes, Descuento, Tipo) VALUES     (linea.cod_concep, linea.unidades, concepto.descripcio, linea.haberes, linea.descuentos, concepto.tipo)
+ENDSCAN
+set relation to
+
+select line
+set filter to tipo = m.gato
+GO TOP
+scatter memvar
+
+m.cod_empado = empleado.codigo
+M.V = TRANSFORM(Line.Codigo, "9999") + " " + TRANSFORM( Line.Unidades,"9999.99") + " " +  TRANSFORM(Line.Descripcio, "XXXXXXXXXXXXXXXXXXXX") + "  " + TRANSFORM( Line.Haberes,"9999.99") + " " + TRANSFORM( Line.Descuento,"9999.99")
+select recibos
+
+#REGION 1
+DEFINE POPUP _s870vc6kb ;
+	PROMPT FIELD TRANSFORM(Line.Codigo, "9999") + " " + TRANSFORM( Line.Unidades,"999.99") + " " +  TRANSFORM(Line.Descripcio, "XXXXXXXXXXXXXXXXXXXX") + "  " + TRANSFORM( Line.Haberes,"9999.99") + " " + TRANSFORM( Line.Descuento,"9999.99") ;
+	SCROLL
+
+*       *********************************************************
+*       *                                                         
+*       *         SUELDO/Windows Distribución de pantalla         
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+IF WVISIBLE("sueldos")
+	ACTIVATE WINDOW sueldos SAME
+ELSE
+	ACTIVATE WINDOW sueldos NOSHOW
+ENDIF
+@ 8.308,73.200 TO 10.231,108.200 ;
+	PATTERN 1 ;
+	PEN 1, 8 ;
+	COLOR RGB(,,,0,255,255)
+@ 4.615,73.200 TO 6.538,108.200 ;
+	PATTERN 1 ;
+	PEN 1, 8 ;
+	COLOR RGB(,,,0,255,255)
+@ 0.000,73.200 TO 1.462,115.400 ;
+	PATTERN 1 ;
+	PEN 1, 8 ;
+	COLOR RGB(,,,0,255,255)
+@ 19.385,0.000 TO 21.308,73.400 ;
+	PATTERN 1 ;
+	PEN 1, 8 ;
+	COLOR RGB(,,,0,255,255)
+@ 18.000,0.000 TO 19.462,73.400 ;
+	PATTERN 1 ;
+	PEN 0, 8 ;
+	COLOR RGB(0,0,0,255,255,255)
+@ 14.769,0.000 TO 16.692,73.400 ;
+	PATTERN 1 ;
+	PEN 1, 8 ;
+	COLOR RGB(,,,0,255,255)
+@ 1.385,0.000 TO 3.308,73.400 ;
+	PATTERN 1 ;
+	PEN 1, 8 ;
+	COLOR RGB(,,,0,255,255)
+@ 13.385,0.000 TO 14.847,73.400 ;
+	PATTERN 1 ;
+	PEN 0, 8 ;
+	COLOR RGB(0,0,0,255,255,255)
+@ 0.000,0.000 TO 1.462,73.400 ;
+	PATTERN 1 ;
+	PEN 1, 0 ;
+	COLOR RGB(255,255,255,255,255,255)
+@ 5.231,74.400 SAY "Código" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,255,,,,)
+@ 8.846,74.400 SAY "Unidades" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,255,,,,)
+@ 5.154,84.000 SAY "Descripción" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,255,,,,)
+@ 8.846,84.000 SAY "Haber" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,255,,,,)
+@ 8.846,94.800 SAY "Deducciones" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,255,,,,)
+@ 19.923,1.200 SAY "Haberes:" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,255,,,,)
+@ 19.923,14.400 SAY "Deducciones:" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,255,,,,)
+@ 19.923,58.800 SAY "Total:" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,255,,,,)
+@ 0.077,75.800 SAY "Liquidación" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,255,,,,)
+@ 19.923,43.200 SAY "Anticipos:" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,255,,,,)
+@ 22.462,18.800 TO 22.539,18.800 ;
+	PEN 1, 8 ;
+	COLOR RGB(192,192,192,192,192,192)
+@ 1.462,0.600 SAY "Código Unidades   Descripción                                Haber       Deducciones" ;
+	FONT "Times New Roman", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,255,,,,)
+@ 15.308,30.000 SAY "Seleccione Banco" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,255,,,,)
+@ 15.308,1.200 SAY "Lapso" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,255,,,,)
+@ 15.308,55.200 SAY "Fecha depósito" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,255,,,,)
+@ 15.308,13.200 SAY "Fecha de Pago" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,255,,,,)
+@ 13.462,25.200 SAY "ULTIMO DEPOSITO" ;
+	FONT "Futura Lt BT", 8 ;
+	STYLE "T" ;
+	COLOR RGB(128,0,0,,,,)
+@ 18.077,28.800 SAY "TOTALES" ;
+	FONT "Futura Lt BT", 8 ;
+	STYLE "T" ;
+	COLOR RGB(128,0,0,,,,)
+@ 3.231,73.200 TO 4.693,115.400 ;
+	PATTERN 1 ;
+	PEN 0, 8 ;
+	COLOR RGB(,,,255,255,255)
+@ 3.308,87.600 SAY "CONCEPTOS" ;
+	FONT "Futura Lt BT", 8 ;
+	STYLE "T" ;
+	COLOR RGB(128,0,0,,,,)
+@ 19.923,28.800 SAY "Adicionales:" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "T" ;
+	COLOR RGB(0,0,255,,,,)
+@ 1.923,76.000 GET m.per_abo ;
+	SIZE 1.000,12.600 ;
+	DEFAULT " " ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@KR 9ºQ 99/99" ;
+	DISABLE
+@ 3.308,0.200 GET m.v ;
+ 	PICTURE "@&N" ;
+	POPUP _s870vc6kb ;
+	SIZE 11.818,52.143 ;
+	DEFAULT " " ;
+	FONT "FoxPrint", 8 ;
+	STYLE "" ;
+	WHEN _s870vc6o1() ;
+	COLOR RGB(,,,255,255,255),RGB(,,,255,255,255)
+@ 7.000,74.800 GET m.codigo ;
+	SIZE 1.000,6.800 ;
+	DEFAULT 0 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "9999" ;
+	VALID _s870vc6op() ;
+	DISABLE
+@ 7.000,84.400 SAY m.descripcio ;
+	SIZE 1.000,23.200 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@!" ;
+	COLOR RGB(,,,255,255,255)
+@ 10.692,74.400 GET m.unidades ;
+	SIZE 1.000,8.000 ;
+	DEFAULT 0 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@K 9999.9" ;
+	DISABLE
+@ 10.692,84.400 GET m.haberes ;
+	SIZE 1.000,8.800 ;
+	DEFAULT 0 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "9999.99" ;
+	WHEN _s870vc6po() ;
+	DISABLE
+@ 10.692,95.200 GET m.descuento ;
+	SIZE 1.000,8.800 ;
+	DEFAULT 0 ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "9999.99" ;
+	WHEN _s870vc6q6() ;
+	DISABLE
+@ 4.615,109.000 GET M.CAMBIA ;
+	PICTURE "@*VN Ö;-;Ó" ;
+	SIZE 1.933,4.571,0.267 ;
+	DEFAULT 1 ;
+	FONT "Symbol", 9 ;
+	VALID _s870vc6qo() ;
+	DISABLE
+@ 16.692,1.800 GET m.periodo ;
+	SIZE 1.000,9.800 ;
+	DEFAULT " " ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@KR 99/99" ;
+	DISABLE
+@ 16.692,13.600 GET m.fecha ;
+	SIZE 1.000,12.200 ;
+	DEFAULT {  /  /  } ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@KD" ;
+	DISABLE
+@ 16.615,30.000 GET m.banco_depo ;
+	PICTURE "@^" ;
+	FROM matriz_bancos ;
+	SIZE 1.538,19.167 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "B" ;
+	DISABLE
+@ 16.692,55.600 GET m.fecha_depo ;
+	SIZE 1.000,12.400 ;
+	DEFAULT {  /  /  } ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@KD" ;
+	DISABLE
+@ 21.615,1.600 SAY M.tothaberes ;
+	SIZE 1.000,11.200 ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(,,,192,192,192)
+@ 21.615,14.800 SAY M.totdescuen ;
+	SIZE 1.000,11.200 ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(,,,192,192,192)
+@ 21.615,29.200 SAY m.totadicion ;
+	SIZE 1.000,11.200 ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(,,,192,192,192)
+@ 21.615,43.600 SAY m.totanticip ;
+	SIZE 1.000,10.200 ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(,,,192,192,192)
+@ 21.615,59.200 SAY M.total ;
+	SIZE 1.000,12.200 ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(255,255,255,128,0,0)
+@ 0.077,0.400 GET m.gato ;
+	PICTURE "@*RHN haberes;deducciones;adicionales;anticipos" ;
+	SIZE 1.214,16.200,2.600 ;
+	DEFAULT 1 ;
+	FONT "Futura Lt BT", 8 ;
+	STYLE "T" ;
+	VALID _s870vc6u1() ;
+	COLOR ,,,,,,,,RGB(128,0,0,255,255,255),RGB(128,0,0,255,255,255)
+@ 20.846,73.400 GET m.movimiento ;
+	PICTURE "@*BHN " + ;
+		(LOCFILE("..\wizards\wizbmps\wztop.bmp","BMP|ICO|PCT|ICN","¿Dónde está wztop?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzback.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzback?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzlocate.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzlocate?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wznext.bmp","BMP|ICO|PCT|ICN","¿Dónde está wznext?")) + ";" + ;
+		(LOCFILE("..\wizards\wizbmps\wzend.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzend?")) ;
+	SIZE 2.000,7.800,0.800 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	WHEN _s870vc6uv() ;
+	VALID _s870vc6va()
+@ 16.154,73.200 GET m.opciones ;
+	PICTURE "@*VN Grabar;Cancelar" ;
+	SIZE 1.923,13.400,0.308 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	VALID _s870vc6vr() ;
+	DISABLE
+@ 13.846,73.200 GET m.nuevo ;
+	PICTURE "@*HN \<Nuevo;\<Borrar;\<Modificar" ;
+	SIZE 1.923,13.400,0.800 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	VALID _s870vc6y6()
+@ 16.154,87.600 GET m.preli ;
+	PICTURE "@*HN V. \<Preliminar" ;
+	SIZE 2.000,13.400,0.800 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	VALID _s870vc6zz()
+@ 16.231,102.000 GET m.salir ;
+	PICTURE "@*BHT " + ;
+		(LOCFILE("..\wizards\wizbmps\wzclose.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzclose?")) ;
+	SIZE 4.000,13.200,0.800 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8
+@ 18.462,87.600 GET m.imprime ;
+	PICTURE "@*HN \<Imprimir" ;
+	SIZE 1.769,13.400,0.800 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	VALID _s870vc70u()
+
+IF NOT WVISIBLE("sueldos")
+	ACTIVATE WINDOW sueldos
+ENDIF
+
+READ CYCLE MODAL ;
+	SHOW _s870vc71t()
+
+RELEASE WINDOW sueldos
+
+*       *********************************************************
+*       *                                                         
+*       *             Windows Cerrando bases de datos             
+*       *                                                         
+*       *********************************************************
+*
+
+IF USED("recibos")
+	SELECT recibos
+	USE
+ENDIF
+
+IF USED("concepto")
+	SELECT concepto
+	USE
+ENDIF
+
+IF USED("linea")
+	SELECT linea
+	USE
+ENDIF
+
+IF USED("banco")
+	SELECT banco
+	USE
+ENDIF
+
+IF USED("localida")
+	SELECT localida
+	USE
+ENDIF
+
+SELECT (m.currarea)
+
+RELEASE POPUPS _s870vc6kb
+
+#REGION 0
+
+SET READBORDER &rborder
+
+IF m.talkstat = "ON"
+	SET TALK ON
+ENDIF
+IF m.compstat = "ON"
+	SET COMPATIBLE ON
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       *            SUELDO/Windows Código de limpieza            
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+close databases
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC6O1           m.v WHEN                           
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         SUELDO,     Record Number:   38    
+*       * Variable:            m.v                                
+*       * Called By:           WHEN Clause                        
+*       * Object Type:         List                               
+*       * Snippet Number:      1                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc6o1     &&  m.v WHEN
+#REGION 1
+SELECT LINE
+if eof()
+	go top
+endif
+SCATTER MEMVAR
+m.acodigo = m.codigo
+select concepto
+if eof()
+	go top
+endif
+locate for codigo = line.codigo
+SHOW GETS
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC6OP           m.codigo VALID                     
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         SUELDO,     Record Number:   39    
+*       * Variable:            m.codigo                           
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Field                              
+*       * Snippet Number:      2                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc6op     &&  m.codigo VALID
+#REGION 1
+select concepto
+locate for codigo = m.codigo
+if found()
+	show get m.unidades enable
+	IF M.gato = 2
+		show get m.descuento enable
+		show get m.haberes disable
+	else
+		show get m.haberes enable
+		show get m.descuento disable
+	endif
+else
+	show get m.unidades disable
+	show get m.haberes disable
+	show get m.descuento disable
+ENDIF
+SHOW GETS
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC6PO           m.haberes WHEN                     
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         SUELDO,     Record Number:   42    
+*       * Variable:            m.haberes                          
+*       * Called By:           WHEN Clause                        
+*       * Object Type:         Field                              
+*       * Snippet Number:      3                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc6po     &&  m.haberes WHEN
+#REGION 1
+O = CONCEPTO.FORMULA
+M.HABERES = &O
+M.HABERES = VAL(TRANSFORM(M.HABERES, "9999.99"))
+SHOW GET M.HABERES
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC6Q6           m.descuento WHEN                   
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         SUELDO,     Record Number:   43    
+*       * Variable:            m.descuento                        
+*       * Called By:           WHEN Clause                        
+*       * Object Type:         Field                              
+*       * Snippet Number:      4                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc6q6     &&  m.descuento WHEN
+#REGION 1
+O = CONCEPTO.FORMULA
+M.DESCUENTO = &O
+M.DESCUENTO = VAL(TRANSFORM(M.DESCUENTO, "9999.99"))
+SHOW GET M.DESCUENTO
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC6QO           M.CAMBIA VALID                     
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         SUELDO,     Record Number:   44    
+*       * Variable:            M.CAMBIA                           
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      5                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc6qo     &&  M.CAMBIA VALID
+#REGION 1
+DO CASE
+CASE M.CAMBIA = 1
+	IF M.HABERES =0 .AND. M.DESCUENTO = 0
+		WAIT WINDOW NOWAIT "EL VALOR NO PUEDE SER CERO"
+		RETURN
+	ENDIF
+	M.O = CONCEPTO.FORMULA
+	IF "UNIDADES" $ M.O .and. UNIDADES = 0
+		WAIT WINDOW NOWAIT "INDIQUE ALGO EN UNIDADES"
+		RETURN
+	ENDIF
+	IF .not. "UNIDADES" $ M.O .and. UNIDADES <> 0 .AND. M.O <> "ANTIGUE()"
+		WAIT WINDOW NOWAIT "ESTE CONCEPTO NO LLEVA UNIDADES"
+		RETURN
+	ENDIF
+
+	SELECT LINE
+	M.TIPO = m.gato
+	IF m.acodigo = 0
+		INSERT INTO LINE FROM MEMVAR
+	ELSE
+		GATHER MEMVAR
+	ENDIF
+
+	DO TOTALES.PRG
+	select line
+	SCATTER MEMVAR BLANK
+	m.acodigo = 0
+	
+	m.v = TRANSFORM(Line.Codigo, "9999") + " " + TRANSFORM( Line.Unidades,"9999.99") + " " +  TRANSFORM(Line.Descripcio, "XXXXXXXXXXXXXXXXXXXX") + "  " + TRANSFORM( Line.Haberes,"9999.99") + " " + TRANSFORM( Line.Descuento,"9999.99")
+	
+	_CUROBJ = OBJNUM(m.codigo)
+
+	
+CASE M.CAMBIA = 2
+	select line
+	IF Line.codigo = 0
+		WAIT WINDOW NOWAIT "NO PUEDE BORRAR UN REGISTRO VACIO"
+		return
+	ENDIF
+	
+	delete
+	if eof()
+		go bottom
+	else
+		skip
+		if eof()
+			go bottom
+		endif
+	endif
+	
+	do totales.prg
+	SCATTER MEMVAR
+	M.acodigo = 0
+	_CUROBJ = OBJNUM(m.codigo)
+	
+CASE M.CAMBIA = 3
+	select concepto
+	browse nomodify noappend nodelete
+	SCATTER MEMVAR
+	_CUROBJ = OBJNUM(M.CODIGO)
+ENDCASE
+
+show gets
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC6U1           m.gato VALID                       
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         SUELDO,     Record Number:   54    
+*       * Variable:            m.gato                             
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Radio Button                       
+*       * Snippet Number:      6                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc6u1     &&  m.gato VALID
+#REGION 1
+do filtrar
+show gets
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC6UV           m.movimiento WHEN                  
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         SUELDO,     Record Number:   55    
+*       * Variable:            m.movimiento                       
+*       * Called By:           WHEN Clause                        
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      7                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc6uv     &&  m.movimiento WHEN
+#REGION 1
+IF BAR < 2
+	RETURN .F.
+ENDIF
+SELECT RECIBOS
+
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC6VA           m.movimiento VALID                 
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         SUELDO,     Record Number:   55    
+*       * Variable:            m.movimiento                       
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      8                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc6va     &&  m.movimiento VALID
+#REGION 1
+do p_mueve.prg
+DO muereci.prg
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC6VR           m.opciones VALID                   
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         SUELDO,     Record Number:   56    
+*       * Variable:            m.opciones                         
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      9                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc6vr     &&  m.opciones VALID
+#REGION 1
+if m.opciones = 1
+	if m.nuevo = 1
+		IF EMPTY(M.per_abo)
+			WAIT WINDOW NOWAIT "ESCRIBA EL PERIODO ABONADO"
+			RETURN
+		ENDIF
+		IF TOTAL <= 0
+			WAIT WINDOW NOWAIT "EL TOTAL NO PUEDE SER CERO"
+			RETURN
+		ENDIF
+		SELECT RECIBOS
+		SET FILTER TO
+		SET ORDER TO
+		GO BOTTOM
+		m.cod_recibo = Recibos.Cod_recibo + 1
+	
+		SELECT LINEA
+		SET FILTER TO
+
+		SELECT LINE
+		SET FILTER TO
+	
+		SCAN FOR Codigo <> 0
+			INSERT INTO LINEA (Cod_concep, Unidades, Haberes, Descuentos, Cod_recibo) Values (Line.Codigo, Line.Unidades, Line.Haberes, Line.Descuento, m.cod_recibo)
+		ENDSCAN
+		
+		M.BAR = m.bar + 1
+		m.cod_empado = empleado.codigo
+		INSERT INTO RECIBOS FROM MEMVAR
+
+		SELECT RECIBOS
+		SET FILTER TO cod_empado = empleado.codigo
+	
+		SELECT LINE
+		SET FILTER TO TIPO = m.gato
+
+	else
+	
+		* solamente se cumple cuando se pulsa el botom "modificar"
+		IF EMPTY(M.per_abo)
+			WAIT WINDOW NOWAIT "ESCRIBA EL PERIODO ABONADO"
+			RETURN
+		ENDIF
+		IF TOTAL <= 0
+			WAIT WINDOW NOWAIT "EL TOTAL NO PUEDE SER CERO"
+			RETURN
+		ENDIF
+	
+		SELECT LINEA
+		SET FILTER TO
+		delete for cod_recibo = recibos.cod_recibo
+		
+		SELECT LINE
+		SET FILTER TO
+	
+		SCAN FOR Codigo <> 0
+			INSERT INTO LINEA (Cod_concep, Unidades, Haberes, Descuentos, Cod_recibo) Values (Line.Codigo, Line.Unidades, Line.Haberes, Line.Descuento, m.cod_recibo)
+		ENDSCAN
+
+		m.cod_empado = empleado.codigo		
+		SELECT RECIBOS
+		gather memvar
+		SET FILTER TO cod_empado = empleado.codigo
+	
+		SELECT LINE
+		SET FILTER TO TIPO = m.gato
+		go top
+	endif
+ENDIF
+
+show gets disable
+SHOW GET M.GATO ENABLE
+SHOW GET M.V ENABLE
+SHOW GET m.nuevo ENABLE
+SHOW GET m.movimiento ENABLE
+show get m.preli enable
+show get m.imprime enable
+SHOW GET m.salir ENABLE
+m.alta = .f.
+M. v = TRANSFORM(Line.Codigo, "9999") + " " + TRANSFORM( Line.Unidades,"9999.99");
+ + " " + TRANSFORM(Line.Descripcio, "XXXXXXXXXXXXXXXXXXXX") + "  " + ;
+ TRANSFORM( Line.Haberes,"9999.99") + " " + TRANSFORM( Line.Descuento,"9999.99")
+
+SELECT RECIBOS
+	
+SHOW GETS
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC6Y6           m.nuevo VALID                      
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         SUELDO,     Record Number:   57    
+*       * Variable:            m.nuevo                            
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      10                                 
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc6y6     &&  m.nuevo VALID
+#REGION 1
+if reccount("recibos") > 30
+	WAIT WINDOW "LA VERSION DE EVALUACION DEL PRODUCTO " + CHR(13) + "A COMPLETADO SU PERIODO." + CHR(13) + "NECESITA ACTUALIZARSE A LA VERSION FINAL. GRACIAS"
+	return
+endif
+
+DO CASE
+CASE m.nuevo = 1
+	M.alta = .t.
+	m.per_abo= " "
+	m.periodo = " "
+	store ctod("00/00/00") to m.fecha_depo, m.fecha
+	store 0 to m.codigo, m.unidades, m.haberes, m.descuento, m.tothaberes, m.totdescu, m.total, m.totadicion, m.totanticip
+	m.gato = 1
+	show gets enable
+
+	SHOW GET m.nuevo DISABLE
+	SHOW GET m.movimiento DISABLE
+	SHOW GET m.salir DISABLE
+	show get m.descuento disable
+	show get m.imprime disable
+
+	set safety off
+	select Line
+	zap
+	set safety on
+	select concepto
+	DO REGISTRO.PRG
+	M.V = TRANSFORM(Line.Codigo, "9999") + " " + TRANSFORM( Line.Unidades,"9999.99") + " " +  TRANSFORM(Line.Descripcio, "XXXXXXXXXXXXXXXXXXXX") + "  " + TRANSFORM( Line.Haberes,"9999.99") + " " + TRANSFORM( Line.Descuento,"9999.99")
+	_CUROBJ = 1
+	m.banco_depo = 1
+CASE M.nuevo = 2
+	do borrar.spr
+	DO MUERECI.PRG
+CASE M.nuevo = 3
+	M.alta = .t.
+	m.gato = 1
+	SELECT CONCEPTO
+	SET FILTER TO CONCEPTO.TIPO = M.GATO
+	GO TOP
+	select line
+	SET FILTER TO LINE.TIPO = M.GATO
+	GO TOP
+	m. v = TRANSFORM(Line.Codigo, "9999") + " " + TRANSFORM( Line.Unidades,"9999.99") + " " + ;
+	 TRANSFORM(Line.Descripcio, "XXXXXXXXXXXXXXXXXXXX") + "  " + TRANSFORM( Line.Haberes,"9999.99") + ;
+	 " " + TRANSFORM( Line.Descuento,"9999.99")
+	select recibos
+	show gets enable
+	SHOW GET m.nuevo DISABLE
+	SHOW GET m.movimiento DISABLE
+	SHOW GET m.salir DISABLE
+	show get m.descuento disable
+	show get m.imprime disable
+
+	_CUROBJ = 1
+
+ENDCASE
+SHOW GETS
+
+
+
+
+
+
+
+
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC6ZZ           m.preli VALID                      
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         SUELDO,     Record Number:   58    
+*       * Variable:            m.preli                            
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      11                                 
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc6zz     &&  m.preli VALID
+#REGION 1
+do numerar.prg
+select banco
+locate for codigo = recibos.banco_depo
+select localida
+locate for cod_postal = empledor.codlugar
+select line
+set filter to
+set safety off
+index on tipo to inditipo
+set safety on
+set order to 1
+report form p_recibo noconsole preview
+set index to
+set filter to tipo = m.gato
+
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC70U           m.imprime VALID                    
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         SUELDO,     Record Number:   60    
+*       * Variable:            m.imprime                          
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      12                                 
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc70u     &&  m.imprime VALID
+#REGION 1
+do numerar.prg
+select banco
+locate for codigo = recibos.banco_depo
+select localida
+locate for cod_postal = empledor.codlugar
+select line
+set filter to
+set safety off
+index on tipo to inditipo
+set safety on
+set order to 1
+report form p_recibo noconsole TO printer prompt
+set index to
+set filter to tipo = m.gato
+
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC71T           Nivel de lectura SHOW              
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         SUELDO                             
+*       * Called By:           READ Statement                     
+*       * Snippet Number:      13                                 
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc71t     && Read Level Show
+PRIVATE currwind
+STORE WOUTPUT() TO currwind
+*
+* Código SHOW de la pantalla: SUELDO
+*
+#REGION 1
+IF SYS(2016) = "SUELDOS" OR SYS(2016) = "*"
+	ACTIVATE WINDOW sueldos SAME
+	@ 7.000,84.400 SAY m.descripcio ;
+		SIZE 1.000,23.200, 0.000 ;
+		FONT "MS Sans Serif", 8 ;
+		PICTURE "@!" ;
+		COLOR RGB(,,,255,255,255)
+	@ 21.615,1.600 SAY M.tothaberes ;
+		SIZE 1.000,11.200, 0.000 ;
+		FONT "MS Sans Serif", 8 ;
+		COLOR RGB(,,,192,192,192)
+	@ 21.615,14.800 SAY M.totdescuen ;
+		SIZE 1.000,11.200, 0.000 ;
+		FONT "MS Sans Serif", 8 ;
+		COLOR RGB(,,,192,192,192)
+	@ 21.615,29.200 SAY m.totadicion ;
+		SIZE 1.000,11.200, 0.000 ;
+		FONT "MS Sans Serif", 8 ;
+		COLOR RGB(,,,192,192,192)
+	@ 21.615,43.600 SAY m.totanticip ;
+		SIZE 1.000,10.200, 0.000 ;
+		FONT "MS Sans Serif", 8 ;
+		COLOR RGB(,,,192,192,192)
+	@ 21.615,59.200 SAY M.total ;
+		SIZE 1.000,12.200, 0.000 ;
+		FONT "MS Sans Serif", 8 ;
+		COLOR RGB(255,255,255,128,0,0)
+ENDIF
+IF NOT EMPTY(currwind)
+	ACTIVATE WINDOW (currwind) SAME
+ENDIF

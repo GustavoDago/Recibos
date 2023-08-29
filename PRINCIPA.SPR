@@ -1,0 +1,289 @@
+*       *********************************************************
+*       *                                                         
+*       * 07/09/99            PRINCIPA.SPR               14:37:12 
+*       *                                                         
+*       *********************************************************
+*       *                                                         
+*       * Gustavo Dagoberto                                       
+*       *                                                         
+*       * Copyright (c) 1999 Gusmafer                             
+*       * Dirección                                               
+*       * Ciudad,     C.P.                                        
+*       * País                                              
+*       *                                                         
+*       * Description:                                            
+*       * Este programa lo ha generado automáticamente GENSCRN.    
+*       *                                                         
+*       *********************************************************
+
+
+#REGION 0
+REGIONAL m.currarea, m.talkstat, m.compstat
+
+IF SET("TALK") = "ON"
+	SET TALK OFF
+	m.talkstat = "ON"
+ELSE
+	m.talkstat = "OFF"
+ENDIF
+m.compstat = SET("COMPATIBLE")
+SET COMPATIBLE FOXPLUS
+
+m.rborder = SET("READBORDER")
+SET READBORDER ON
+
+m.currarea = SELECT()
+
+
+*       *********************************************************
+*       *                                                         
+*       *             Windows Definiciones de ventana             
+*       *                                                         
+*       *********************************************************
+*
+
+MODIFY WINDOW SCREEN ;
+	AT 0.000, 0.000 ;
+	SIZE 28.846,120.800 ;
+	TITLE "SISTEMA DE LIQUIDACION DE SUELDOS " ;
+	FONT "MS Sans Serif", 8 ;
+	FLOAT ;
+	CLOSE ;
+	MINIMIZE ;
+	FILL FILE LOCFILE("ENREDA~1.BMP","BMP|ICO|PCT|ICN", ;
+		"¿Dónde está enreda~1?")
+MOVE WINDOW SCREEN CENTER
+CLEAR
+
+*       *********************************************************
+*       *                                                         
+*       *  PRINCIPA/Windows Código de configuración - SECCION 2   
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+set sysmenu off
+set status bar off
+SET POINT TO '.'
+SET DATE FRENCH
+SET CENTURY off
+SET MARK TO '/'
+SET DELETED ON
+m.titemple = " "
+
+
+*       *********************************************************
+*       *                                                         
+*       *        PRINCIPA/Windows Distribución de pantalla        
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+@ 9.231,2.400 GET M.EMPLEADOS ;
+	PICTURE "@*HN EMPLEADOS" ;
+	SIZE 3.769,22.167,0.667 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "B" ;
+	VALID _s870vc3u6()
+@ 4.615,2.400 GET M.EMPLEADORES ;
+	PICTURE "@*HN EMPLEADORES" ;
+	SIZE 3.769,22.167,0.667 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "B" ;
+	VALID _s870vc3up()
+@ 13.846,2.400 GET M.CONCEPTOS ;
+	PICTURE "@*HN CONCEPTOS" ;
+	SIZE 3.769,22.167,0.667 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "B" ;
+	VALID _s870vc3v5()
+@ 23.077,50.400 GET M.SUELDOS ;
+	PICTURE "@*HN LIQUIDAR SUELDOS" ;
+	SIZE 3.692,22.167,0.667 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "B" ;
+	VALID _s870vc3vn()
+@ 23.077,93.600 GET m.salir ;
+	PICTURE "@*BHT " + ;
+		(LOCFILE("..\wizards\wizbmps\wzclose.bmp","BMP|ICO|PCT|ICN","¿Dónde está wzclose?")) ;
+	SIZE 3.769,26.600,0.800 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8
+@ 18.462,2.400 GET M.LOCALIDAD ;
+	PICTURE "@*HN LOCALIDADES" ;
+	SIZE 3.692,22.167,0.667 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "B" ;
+	VALID _s870vc3wk()
+@ 23.077,2.400 GET m.Admi_ban ;
+	PICTURE "@*HN BANCOS" ;
+	SIZE 3.769,22.167,0.667 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "B" ;
+	VALID _s870vc3x1()
+@ 6.077,33.600 SAY "Sistema Administrador de " + CHR(13) + ;
+		"" + CHR(13) + ;
+		"RECIBOS DE SUELDO" ;
+	SIZE 3.000,23.706, 0.000 ;
+	PICTURE "@I" ;
+	FONT "MS Sans Serif", 24 ;
+	STYLE "BT" ;
+	COLOR RGB(255,255,0,,,,)
+@ 27.231,16.800 SAY "Versión de evaluación. Teléfono (03407) 489478" ;
+	FONT "Courier New", 12 ;
+	COLOR RGB(255,255,255,128,128,128)
+
+
+
+READ CYCLE
+
+MODIFY WINDOW SCREEN
+SELECT (m.currarea)
+
+
+#REGION 0
+
+SET READBORDER &rborder
+
+IF m.talkstat = "ON"
+	SET TALK ON
+ENDIF
+IF m.compstat = "ON"
+	SET COMPATIBLE ON
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC3U6           M.EMPLEADOS VALID                  
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         PRINCIPA,     Record Number:    2  
+*       * Variable:            M.EMPLEADOS                        
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      1                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc3u6     &&  M.EMPLEADOS VALID
+#REGION 1
+DO EMPLEADO.SPR
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC3UP           M.EMPLEADORES VALID                
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         PRINCIPA,     Record Number:    3  
+*       * Variable:            M.EMPLEADORES                      
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      2                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc3up     &&  M.EMPLEADORES VALID
+#REGION 1
+DO EMPLEDOR.SPR
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC3V5           M.CONCEPTOS VALID                  
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         PRINCIPA,     Record Number:    4  
+*       * Variable:            M.CONCEPTOS                        
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      3                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc3v5     &&  M.CONCEPTOS VALID
+#REGION 1
+DO CONCEPTO.SPR
+
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC3VN           M.SUELDOS VALID                    
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         PRINCIPA,     Record Number:    5  
+*       * Variable:            M.SUELDOS                          
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      4                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc3vn     &&  M.SUELDOS VALID
+#REGION 1
+m.nocontinua = 0
+DO RELAEMPL.SPR
+IF m.nocontinua = 1
+	USE IN EMPLEADO
+	USE IN EMPLEDOR
+	SELECT 0
+	return
+endif
+if .not. empty(empleado.nombre)
+	m.titemple = empleado.nombre
+	DO SUELDO.SPR
+endif
+SELECT 0
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC3WK           M.LOCALIDAD VALID                  
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         PRINCIPA,     Record Number:    7  
+*       * Variable:            M.LOCALIDAD                        
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      5                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc3wk     &&  M.LOCALIDAD VALID
+#REGION 1
+DO LOCALIDA.SPR
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC3X1           m.Admi_ban VALID                   
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         PRINCIPA,     Record Number:    8  
+*       * Variable:            m.Admi_ban                         
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      6                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc3x1     &&  m.Admi_ban VALID
+#REGION 1
+do bancos.spr

@@ -1,0 +1,157 @@
+*       *********************************************************
+*       *                                                         
+*       * 07/09/99             BORRAR.SPR                14:37:19 
+*       *                                                         
+*       *********************************************************
+*       *                                                         
+*       * Gustavo Dagoberto                                       
+*       *                                                         
+*       * Copyright (c) 1999 Gusmafer                             
+*       * Dirección                                               
+*       * Ciudad,     C.P.                                        
+*       * País                                              
+*       *                                                         
+*       * Description:                                            
+*       * Este programa lo ha generado automáticamente GENSCRN.    
+*       *                                                         
+*       *********************************************************
+
+
+#REGION 0
+REGIONAL m.currarea, m.talkstat, m.compstat
+
+IF SET("TALK") = "ON"
+	SET TALK OFF
+	m.talkstat = "ON"
+ELSE
+	m.talkstat = "OFF"
+ENDIF
+m.compstat = SET("COMPATIBLE")
+SET COMPATIBLE FOXPLUS
+
+m.rborder = SET("READBORDER")
+SET READBORDER ON
+
+*       *********************************************************
+*       *                                                         
+*       *             Windows Definiciones de ventana             
+*       *                                                         
+*       *********************************************************
+*
+
+IF NOT WEXIST("borrar") ;
+	OR UPPER(WTITLE("BORRAR")) == "BORRAR.PJX" ;
+	OR UPPER(WTITLE("BORRAR")) == "BORRAR.SCX" ;
+	OR UPPER(WTITLE("BORRAR")) == "BORRAR.MNX" ;
+	OR UPPER(WTITLE("BORRAR")) == "BORRAR.PRG" ;
+	OR UPPER(WTITLE("BORRAR")) == "BORRAR.FRX" ;
+	OR UPPER(WTITLE("BORRAR")) == "BORRAR.QPR"
+	DEFINE WINDOW borrar ;
+		AT  0.000, 0.000  ;
+		SIZE 12.000,60.000 ;
+		TITLE "Confirmación de borrado" ;
+		FONT "MS Sans Serif", 8 ;
+		FLOAT ;
+		NOCLOSE ;
+		NOMINIMIZE ;
+		DOUBLE ;
+		COLOR RGB(,,,192,192,192)
+	MOVE WINDOW borrar CENTER
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       *         BORRAR/Windows Distribución de pantalla         
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+IF WVISIBLE("borrar")
+	ACTIVATE WINDOW borrar SAME
+ELSE
+	ACTIVATE WINDOW borrar NOSHOW
+ENDIF
+@ 2.769,16.800 SAY "¿ REALMENTE DESEA BORRAR" + CHR(13) + ;
+		" EL RECIBO ?" ;
+	SIZE 2.000,31.000, 0.000 ;
+	PICTURE "@I" ;
+	FONT "Times New Roman", 10 ;
+	STYLE "BT"
+@ 7.385,7.200 GET M.BOT_BORRA ;
+	PICTURE "@*HT BORRAR;CANCELAR" ;
+	SIZE 2.846,13.000,6.667 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "B" ;
+	VALID _s870vc91p()
+@ 0.000,0.000 TO 12.000,60.000 ;
+	PEN 6, 8
+@ 0.923,2.400 SAY (LOCFILE("misc06.bmp","BMP|ICO|PCT|ICN", "¿Dónde está misc06?" )) BITMAP ;
+	SIZE 5.615,14.600 ;
+	ISOMETRIC ;
+	STYLE "T"
+@ 0.769,2.000 TO 11.231,2.000 ;
+	PEN 4, 8 ;
+	COLOR RGB(128,128,128,128,128,128)
+@ 0.769,57.200 TO 11.231,57.200 ;
+	PEN 4, 8 ;
+	COLOR RGB(255,255,255,255,255,255)
+@ 10.923,2.000 TO 10.923,58.000 ;
+	PEN 4, 8 ;
+	STYLE "1" ;
+	COLOR RGB(255,255,255,255,255,255)
+@ 0.769,2.000 TO 0.769,58.000 ;
+	PEN 4, 8 ;
+	STYLE "1" ;
+	COLOR RGB(128,128,128,128,128,128)
+
+IF NOT WVISIBLE("borrar")
+	ACTIVATE WINDOW borrar
+ENDIF
+
+READ CYCLE MODAL
+
+RELEASE WINDOW borrar
+
+#REGION 0
+
+SET READBORDER &rborder
+
+IF m.talkstat = "ON"
+	SET TALK ON
+ENDIF
+IF m.compstat = "ON"
+	SET COMPATIBLE ON
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       * _S870VC91P           M.BOT_BORRA VALID                  
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         BORRAR,     Record Number:    3    
+*       * Variable:            M.BOT_BORRA                        
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      1                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _s870vc91p     &&  M.BOT_BORRA VALID
+#REGION 1
+IF m.bot_borra = 1
+	select linea
+	delete all for linea.cod_recibo = recibos.cod_recibo
+	select recibos
+	delete
+	if .not. bof()
+		skip - 1
+	endif
+	scatter memvar	
+	m.bar = m.bar - 1
+endif
